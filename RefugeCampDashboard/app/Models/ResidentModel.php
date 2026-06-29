@@ -4,15 +4,25 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class ActivityModel extends Model
+class ResidentModel extends Model
 {
-    protected $table            = 'activities';
+    protected $table            = 'residents';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['title', 'description', 'cost', 'receipt_path'];
+   protected $allowedFields    = [
+        'first_name',
+        'last_name',
+        'full_name',
+        'primary_phone',
+        'backup_phone',
+        'marital_status',
+        'children_count',
+        'notes',
+        'is_active'
+    ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
