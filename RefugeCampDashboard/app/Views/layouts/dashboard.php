@@ -27,6 +27,9 @@
             <li>
                 <a href="<?= base_url('residents') ?>" class="nav-link text-white">Residents Database</a>
             </li>
+            <li>
+                <a href="<?= base_url('donations') ?>" class="nav-link text-white">Financial Donations</a>
+            </li>
         </ul>
         <hr>
         <div class="dropdown">

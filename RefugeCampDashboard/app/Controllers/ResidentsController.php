@@ -81,9 +81,25 @@ class ResidentsController extends BaseController
             return redirect()->to('residents')->with('error', 'Resident profile not found.');
         }
 
+        // return view('residents/edit', [
+        //     'title'    => 'Edit Resident Profile',
+        //     'resident' => $resident
+        // ]);
+
+        $db = \Config\Database::connect();
+        $history = $db->table('activity_residents')
+                    ->join('activities', 'activities.id = activity_residents.activity_id')
+                    ->where('activity_residents.resident_id', $id)
+                    ->where('activities.deleted_at', null) // Filter out soft-deleted activities
+                    ->orderBy('activities.created_at', 'DESC')
+                    ->select('activities.title, activities.cost, activities.created_at, activities.id')
+                    ->get()
+                    ->getResultArray();
+
         return view('residents/edit', [
             'title'    => 'Edit Resident Profile',
-            'resident' => $resident
+            'resident' => $resident,
+            'history'  => $history
         ]);
     }
 
@@ -106,13 +122,6 @@ class ResidentsController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // $model->update($id, [
-        //     'first_name'      => $this->request->getPost('first_name'),
-        //     'last_name'       => $this->request->getPost('last_name'),
-        //     'emergency_phone' => $this->request->getPost('emergency_phone'),
-        //     'notes'           => $this->request->getPost('notes'),
-        //     'is_active'       => $this->request->getPost('is_active') ?? 0
-        // ]);
         $model->update($id, [
             'first_name'     => $this->request->getPost('first_name'),
             'last_name'      => $this->request->getPost('last_name'),

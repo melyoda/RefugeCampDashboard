@@ -7,7 +7,7 @@ Edit Activity
 <?= $this->section('page_title') ?>
 Modify Activity Record
 <?= $this->endSection() ?>
-
+0592659636
 <?= $this->section('content') ?>
 <div class="row">
     <div class="col-md-8">
@@ -55,11 +55,28 @@ Modify Activity Record
 
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="<?= base_url('activities') ?>" class="btn btn-light border btn-sm">Cancel</a>
+                        <div class="mb-3 card p-3 border-0 shadow-sm">
                         <button type="submit" class="btn btn-primary btn-sm px-4">Update Entry</button>
                     </div>
                 </form>
-
             </div>
+
+                <label class="form-label fw-bold mb-1">Benefiting Residents <span class="text-muted small fw-normal">(Optional — check off individuals who directly received items/care)</span></label>
+                <small class="text-muted d-block mb-2">Leave blank if this is a general camp expense (e.g., site repairs, common water tank refill).</small>
+                <div style="max-height: 200px; overflow-y: auto;" class="border rounded p-2 bg-white">
+                    <?php if (!empty($residents)): foreach ($residents as $res): ?>
+                    <div class="form-check py-1 border-bottom border-light">
+                        <input class="form-check-input" type="checkbox" name="resident_ids[]" value="<?= $res['id'] ?>" id="res_<?= $res['id'] ?>"
+                            <?= (isset($linkedResidentIds) && in_array($res['id'], $linkedResidentIds)) ? 'checked' : '' ?>>
+                        <label class="form-check-label small" for="res_<?= $res['id'] ?>">
+                        <strong><?= esc($res['full_name']) ?></strong> (<?= esc($res['last_name']) ?>, <?= esc($res['first_name']) ?>)
+                        </label>
+                    </div>
+                        <?php endforeach; else: ?>
+                            <span class="text-muted small p-2 d-block">No active residents found to link.</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
         </div>
     </div>
 </div>

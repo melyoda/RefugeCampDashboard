@@ -28,3 +28,8 @@ $routes->get('residents/edit/(:num)', 'ResidentsController::edit/$1');
 // $routes->post('residents/update Pis/(:num)', 'ResidentsController::update/$1');
 $routes->post('residents/update/(:num)', 'ResidentsController::update/$1');
 $routes->post('residents/delete/(:num)', 'ResidentsController::delete/$1');
+
+// Donations Ledger Routes
+$routes->get('donations', 'DonationsController::index');
+$routes->get('donations/create', 'DonationsController::create');
+$routes->post('donations/store', 'DonationsController::store');

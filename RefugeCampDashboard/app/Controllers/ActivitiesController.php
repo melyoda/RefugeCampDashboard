@@ -4,33 +4,57 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\ActivityModel;
-// use CodeIgniter\HTTP\ResponseInterface;
-
+use App\Models\ResidentModel;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
 class ActivitiesController extends BaseController
 {
+    protected $activityModel;
+    protected $residentModel;
+
+    /**
+     * Initializes the controller and bootstraps our tracking models
+     */
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    {
+        // Always execute the parent framework routine first
+        parent::initController($request, $response, $logger);
+
+        // Spin models up once in memory right here
+        $this->activityModel = new ActivityModel();
+        $this->residentModel = new ResidentModel();
+    }
+
     // List all logged activities
     public function index()
     {
-        $model = new ActivityModel();
+        // $model = new ActivityModel();
         //use database query to fetch all activities and order by created_at descending
         $data = [
             'page_title' => 'Activities Log',
-            'activities' => $model->orderBy('created_at', 'DESC')->findAll()
+            'activities' => $this->activityModel->orderBy('created_at', 'DESC')->findAll()
         ];
 
         return view('activities/index', $data);
     }
 
     // Show the "Log New Activity" Form
-    public function create()
+   public function create()
     {
-        return view('activities/create', ['page_title' => 'Log New Activity']);
+        $data = [
+            'page_title' => 'Log New Activity',
+            // Pass the active residents to populate checkboxes
+            'residents'  => $this->residentModel->where('is_active', 1)->orderBy('last_name', 'ASC')->findAll()
+        ];
+
+        return view('activities/create', $data);
     }
 
     // Process the form submission & upload file
     public function store()
     {
-        $model = new ActivityModel();
+        // $model = new ActivityModel();
 
         // Simple validation rule matching the fields
         $rules = [
@@ -56,36 +80,82 @@ class ActivitiesController extends BaseController
         }
 
         // Save into XAMPP Database
-        $model->save([
+        $this->activityModel->save([
             'title'        => $this->request->getPost('title'),
             'description'  => $this->request->getPost('description'),
             'cost'         => $this->request->getPost('cost'),
             'receipt_path' => $receiptPath,
         ]);
 
+        // return redirect()->to('activities')->with('success', 'Activity logged successfully!');
+        // --- NEW: Process Junction Table Links for Residents ---
+        $activityId = $this->activityModel->getInsertID();
+        $selectedResidents = $this->request->getPost('resident_ids');
+
+        if (!empty($selectedResidents) && is_array($selectedResidents)) {
+            $db = \Config\Database::connect();
+            $linkages = [];
+            foreach ($selectedResidents as $resId) {
+                $linkages[] = [
+                    'activity_id' => $activityId,
+                    'resident_id' => $resId,
+                    'created_at'  => date('Y-m-d H:i:s')
+                ];
+            }
+            $db->table('activity_residents')->insertBatch($linkages);
+        }
+
         return redirect()->to('activities')->with('success', 'Activity logged successfully!');
     }
 
+    // public function edit($id)
+    // {
+    //     // $model = new ActivityModel();
+    //     $activity = $this->activityModel->find($id);
+
+    //     if (!$activity) {
+    //         return redirect()->to('activities')->with('error', 'Activity not found.');
+    //     }
+
+    //    return view('activities/edit', [
+    //         'page_title' => 'Edit Activity',
+    //         'activity'   => $activity,
+    //         // Pass the residents to populate checkboxes on edit layout too
+    //         'residents'  => $this->residentModel->where('is_active', 1)->orderBy('last_name', 'ASC')->findAll()
+    //     ]);
+    // }
     public function edit($id)
     {
-        $model = new ActivityModel();
-        $activity = $model->find($id);
+        $activity = $this->activityModel->find($id);
 
         if (!$activity) {
             return redirect()->to('activities')->with('error', 'Activity not found.');
         }
 
+        // --- NEW: Fetch only the linked resident IDs for this specific activity ---
+        $db = \Config\Database::connect();
+        $linkedResidentRows = $db->table('activity_residents')
+                                 ->where('activity_id', $id)
+                                 ->select('resident_id')
+                                 ->get()
+                                 ->getResultArray();
+
+        // Convert the multi-dimensional array into a simple, flat array of IDs: [1, 4, 7]
+        $linkedResidentIds = array_column($linkedResidentRows, 'resident_id');
+
         return view('activities/edit', [
-            'page_title' => 'Edit Activity',
-            'activity'   => $activity
+            'page_title'        => 'Edit Activity',
+            'activity'          => $activity,
+            'residents'         => $this->residentModel->where('is_active', 1)->orderBy('last_name', 'ASC')->findAll(),
+            'linkedResidentIds' => $linkedResidentIds // Pass this safe array directly to the template layout
         ]);
     }
 
     // Process the update submission
     public function update($id)
     {
-        $model = new ActivityModel();
-        $activity = $model->find($id);
+        // $model = new ActivityModel();
+        $activity = $this->activityModel->find($id);
 
         if (!$activity) {
             return redirect()->to('activities')->with('error', 'Activity not found.');
@@ -112,12 +182,33 @@ class ActivitiesController extends BaseController
         $receiptPath = 'uploads/receipts/' . $newName;
     }
 
-        $model->update($id, [
+        $this->activityModel->update($id, [
             'title'        => $this->request->getPost('title'),
             'description'  => $this->request->getPost('description'),
             'cost'         => $this->request->getPost('cost'),
             'receipt_path' => $receiptPath,
         ]);
+
+        // return redirect()->to('activities')->with('success', 'Activity updated successfully!');
+        // --- NEW: Sync Junction Table Links for Residents ---
+        $db = \Config\Database::connect();
+        $builder = $db->table('activity_residents');
+
+        // Clear old items to prevent duplication strings
+        $builder->where('activity_id', $id)->delete();
+
+        $selectedResidents = $this->request->getPost('resident_ids');
+        if (!empty($selectedResidents) && is_array($selectedResidents)) {
+            $linkages = [];
+            foreach ($selectedResidents as $resId) {
+                $linkages[] = [
+                    'activity_id' => $id,
+                    'resident_id' => $resId,
+                    'created_at'  => date('Y-m-d H:i:s')
+                ];
+            }
+            $builder->insertBatch($linkages);
+        }
 
         return redirect()->to('activities')->with('success', 'Activity updated successfully!');
     }
@@ -125,9 +216,9 @@ class ActivitiesController extends BaseController
     // Delete an activity record
     public function delete($id)
     {
-        $model = new ActivityModel();
-        if ($model->find($id)) {
-            $model->delete($id);
+        // $model = new ActivityModel();
+       if ($this->activityModel->find($id)) {
+            $this->activityModel->delete($id);
             return redirect()->to('activities')->with('success', 'Activity deleted successfully.');
         }
         return redirect()->to('activities')->with('error', 'Activity not found.');

@@ -82,6 +82,41 @@
                             <button type="submit" class="btn btn-primary px-4">Update Profile Record</button>
                         </div>
                     </form>
+
+                    <!-- Placement: Right underneath the existing form container inside edit.php -->
+                    <div class="row mt-4">
+                        <div class="col-md-8 mx-auto">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-secondary text-white">
+                                    <h6 class="mb-0">Individual Distribution & Intervention History</h6>
+                                </div>
+                                <div class="table-responsive bg-white">
+                                    <table class="table table-hover align-middle mb-0 small">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Date Attached</th>
+                                                <th>Activity Log Item</th>
+                                                <th>Cost Share Metric</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php if (!empty($history)): foreach ($history as $h): ?>
+                                                <tr>
+                                                    <td><?= date('Y-m-d H:i', strtotime($h['created_at'])) ?></td>
+                                                    <td class="fw-bold text-dark"><?= esc($h['title']) ?></td>
+                                                    <td>$<?= number_format($h['cost'], 2) ?> USD</td>
+                                                </tr>
+                                            <?php endforeach; else: ?>
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted py-3">This resident has not been explicitly linked to any individual ledger distributions yet.</td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
