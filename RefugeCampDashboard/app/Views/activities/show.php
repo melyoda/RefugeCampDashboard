@@ -74,16 +74,24 @@
                             Check off families or individual residents as they arrive to receive their allocated share of this resource lot.
                         </p>
 
+                        <div class="mb-3">
+                            <div class="input-group input-group-sm shadow-sm">
+                                <span class="input-group-text bg-white text-muted border-end-0">🔍</span>
+                                <input type="text" id="residentSearch" class="form-control border-start-0 ps-1" placeholder="Type name or family tag to filter roster instantly...">
+                            </div>
+                        </div>
+
                         <form action="<?= base_url('activities/save-distribution/' . $activity['id']) ?>" method="POST">
                             <?= csrf_field() ?>
 
                             <div style="max-height: 440px; overflow-y: auto;" class="border rounded shadow-sm bg-white mb-3">
-                                <div class="list-group list-group-flush">
+                                <div class="list-group list-group-flush" id="distributionList">
                                     <?php if (!empty($residents)): foreach ($residents as $res): ?>
 
-                                        <label class="list-group-item list-group-item-action d-flex align-items-center justify-content-between px-3 py-2-5 ms-0 style-clickable-item" style="cursor: pointer;" for="res_<?= $res['id'] ?>">
-                                            <div class="d-flex align-items-center">
-
+                                        <label class="list-group-item list-group-item-action d-flex align-items-center justify-content-between px-3 py-2.5 ms-0 resident-item" 
+                                            style="cursor: pointer;"
+                                            for="res_<?= $res['id'] ?>"
+                                            data-name="<?= strtolower(esc($res['full_name'] . ' ' . $res['last_name'] . ' ' . ($res['document_id'] ?? ''))) ?>"> <div class="d-flex align-items-center">
                                                 <div class="me-3 d-flex align-items-center">
                                                     <input class="form-check-input my-0" type="checkbox" name="resident_ids[]" value="<?= $res['id'] ?>" id="res_<?= $res['id'] ?>"
                                                         <?= (isset($linkedResidentIds) && in_array($res['id'], $linkedResidentIds)) ? 'checked' : '' ?>>
@@ -91,11 +99,13 @@
 
                                                 <div>
                                                     <span class="d-block fw-bold text-dark small mb-0"><?= esc($res['full_name']) ?></span>
-                                                    <span class="text-muted text-uppercase" style="font-size: 0.75rem; tracking: 0.5px;"><?= esc($res['last_name']) ?>, <?= esc($res['first_name']) ?></span>
+                                                    <span class="text-muted text-uppercase font-monospace" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                                                        ID: <?= esc($res['document_id'] ?: 'N/A') ?> • <?= esc($res['last_name']) ?>
+                                                    </span>
                                                 </div>
                                             </div>
 
-                                            <span class="badge bg-light text-dark border rounded-pill px-2-5 py-1.5 font-monospace small">
+                                            <span class="badge bg-light text-dark border rounded-pill px-2.5 py-1.5 font-monospace small">
                                                 <?= $res['children_count'] ?> Dep
                                             </span>
                                         </label>
@@ -126,4 +136,27 @@
 
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('residentSearch');
+    const items = document.querySelectorAll('.resident-item');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+            const query = e.target.value.toLowerCase().trim();
+
+            items.forEach(function (item) {
+                const nameData = item.getAttribute('data-name');
+
+                if (nameData.includes(query)) {
+                    item.style.setProperty('display', 'flex', 'important');
+                } else {
+                    item.style.setProperty('display', 'none', 'important');
+                }
+            });
+        });
+    }
+});
+</script>
 <?= $this->endSection() ?>

@@ -19,6 +19,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark">
                     <tr>
+                        <th>Registration ID</th>
                         <th>Full Name</th>
                         <th>Status</th>
                         <th>Contacts</th>
@@ -29,6 +30,9 @@
                 <tbody>
                     <?php if (!empty($residents)): foreach ($residents as $r): ?>
                         <tr>
+                            <td class="font-monospace fw-bold small">
+                                <?= esc($r['document_id'] ?: '—') ?>
+                            </td>
                             <td>
                                 <div class="fw-bold"><?= esc($r['full_name']) ?></div>
                                 <small class="text-muted"><?= esc($r['last_name']) ?>, <?= esc($r['first_name']) ?></small>

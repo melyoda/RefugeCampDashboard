@@ -40,6 +40,9 @@ class ResidentsController extends BaseController
         $rules = [
             'first_name' => 'required|min_length[2]|max_length[100]',
             'last_name'  => 'required|min_length[2]|max_length[100]',
+
+            'document_id'    => 'required|min_length[3]|max_length[100]|is_unique[residents.document_id,id,{id}]',
+            'primary_phone'  => 'required|min_length[7]|max_length[20]',
         ];
 
         if (!$this->validate($rules)) {
@@ -55,6 +58,7 @@ class ResidentsController extends BaseController
         //     'is_active'       => 1 // Enrolls active by default
         // ]);
         $model->save([
+            'document_id' => $this->request->getPost('document_id') ?: null,
             'first_name'     => $this->request->getPost('first_name'),
             'last_name'      => $this->request->getPost('last_name'),
             'full_name'      => $this->request->getPost('full_name'),
@@ -116,6 +120,9 @@ class ResidentsController extends BaseController
         $rules = [
             'first_name' => 'required|min_length[2]|max_length[100]',
             'last_name'  => 'required|min_length[2]|max_length[100]',
+
+            'document_id'    => 'required|min_length[3]|max_length[100]|is_unique[residents.document_id,id,{id}]',
+            'primary_phone'  => 'required|min_length[7]|max_length[20]',
         ];
 
         if (!$this->validate($rules)) {
@@ -123,6 +130,7 @@ class ResidentsController extends BaseController
         }
 
         $model->update($id, [
+            'document_id'    => $this->request->getPost('document_id') ?: null,
             'first_name'     => $this->request->getPost('first_name'),
             'last_name'      => $this->request->getPost('last_name'),
             'full_name'      => $this->request->getPost('full_name'),

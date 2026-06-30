@@ -24,6 +24,11 @@
                     <form action="<?= base_url('residents/update/' . $resident['id']) ?>" method="POST">
                         <?= csrf_field() ?>
 
+                        <div class="mb-3">
+                            <label for="document_id" class="form-label fw-bold">Document ID <span class="text-danger">*</span></label>
+                            <input type="text" name="document_id" id="document_id" class="form-control" value="<?= old('document_id', $resident['document_id'] ?? '') ?>" required placeholder="e.g. National ID, Passport Number, 9-digit ID">
+                        </div>
+
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <label for="first_name" class="form-label fw-bold">First Name</label>
