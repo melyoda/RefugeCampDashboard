@@ -54,8 +54,6 @@ class ActivitiesController extends BaseController
     // Process the form submission & upload file
     public function store()
     {
-        // $model = new ActivityModel();
-
         // Simple validation rule matching the fields
         $rules = [
             'title' => 'required|min_length[3]',
@@ -85,6 +83,8 @@ class ActivitiesController extends BaseController
             'description'  => $this->request->getPost('description'),
             'cost'         => $this->request->getPost('cost'),
             'receipt_path' => $receiptPath,
+            'is_distributed_aid' => $this->request->getPost('is_distributed_aid') ?? 0,
+            'aid_category'       => $this->request->getPost('aid_category') ?: null,
         ]);
 
         // return redirect()->to('activities')->with('success', 'Activity logged successfully!');
@@ -187,6 +187,8 @@ class ActivitiesController extends BaseController
             'description'  => $this->request->getPost('description'),
             'cost'         => $this->request->getPost('cost'),
             'receipt_path' => $receiptPath,
+            'is_distributed_aid' => $this->request->getPost('is_distributed_aid') ?? 0,
+            'aid_category'       => $this->request->getPost('aid_category') ?: null,
         ]);
 
         // return redirect()->to('activities')->with('success', 'Activity updated successfully!');

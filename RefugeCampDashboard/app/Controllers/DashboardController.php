@@ -17,6 +17,7 @@ class DashboardController extends BaseController
     protected $residentModel;
     protected $donationModel;
 
+
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
@@ -36,6 +37,11 @@ class DashboardController extends BaseController
         $childrenSumRow = $this->residentModel->selectSum('children_count')->where('is_active', 1)->first();
         $totalChildrenCount = $childrenSumRow['children_count'] ?? 0;
         $totalHeadcount = $activeAdultsCount + $totalChildrenCount;
+
+       // 1a. Calculate Aid Distribution Counts
+        // $waterDeliveries = $this->activityModel->where('aid_category', 'Water Supply')->countAllResults();
+        // $foodDistributed = $this->activityModel->where('aid_category', 'Food Basket')->countAllResults();
+        // $hygieneDistributed = $this->activityModel->where('aid_category', 'Hygiene Kit')->countAllResults();
 
         // 2. Sum Total Lifetime Incoming Donations
         $totalDonationsRow = $this->donationModel->selectSum('amount')->first();

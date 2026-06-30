@@ -12,7 +12,15 @@ class ActivityModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['title', 'description', 'cost', 'receipt_path'];
+    protected $allowedFields    = [
+        'title',
+        'description',
+        'cost',
+        'receipt_path',
+        'is_distributed_aid',
+        'aid_category'
+    ];
+
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

@@ -26,9 +26,27 @@ Log a New Camp Activity
                         </ul>
                     </div>
                 <?php endif; ?>
-
                 <form action="<?= base_url('activities/store') ?>" method="POST" enctype="multipart/form-data">
                     <?= csrf_field() ?>
+
+                        <div class="row g-3 mb-3">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="form-check form-switch mt-4">
+                                <input class="form-check-input" type="checkbox" name="is_distributed_aid" value="1" id="isAid" <?= old('is_distributed_aid', $activity['is_distributed_aid'] ?? 0) ? 'checked' : '' ?>>
+                                <label class="form-check-label fw-bold" for="isAid">This is a distributed aid item / resource</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="aid_category" class="form-label fw-bold small">Aid Category <span class="text-muted">(If applicable)</span></label>
+                            <select name="aid_category" id="aid_category" class="form-select">
+                                <option value="">-- General / Operational Expense --</option>
+                                <option value="Water Supply" <?= old('aid_category', $activity['aid_category'] ?? '') === 'Water Supply' ? 'selected' : '' ?>>🚰 Water Supply (Trucks, Maintenance)</option>
+                                <option value="Food Basket" <?= old('aid_category', $activity['aid_category'] ?? '') === 'Food Basket' ? 'selected' : '' ?>>📦 Food Basket / Crates</option>
+                                <option value="Hygiene Kit" <?= old('aid_category', $activity['aid_category'] ?? '') === 'Hygiene Kit' ? 'selected' : '' ?>>🧼 Cleaning Supplies / Hygiene Kits</option>
+                                <option value="Medical Supplies" <?= old('aid_category', $activity['aid_category'] ?? '') === 'Medical Supplies' ? 'selected' : '' ?>>🩺 Medical Equipment & Care</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <div class="mb-3">
                         <label for="title" class="form-label fw-bold small">Activity / Purchase Title <span class="text-danger">*</span></label>
