@@ -40,7 +40,7 @@ Logged Camp Activities
                         </tr>
                     <?php else: ?>
                         <?php foreach ($activities as $activity): ?>
-                            <tr>
+                            <tr onclick="window.location='<?= base_url('activities/show/' . $activity['id']) ?>';" style="cursor: pointer;">
                                 <td class="ps-3 small text-muted">
                                     <?= date('M d, Y H:i', strtotime($activity['created_at'])) ?>
                                 </td>

@@ -108,22 +108,6 @@ class ActivitiesController extends BaseController
         return redirect()->to('activities')->with('success', 'Activity logged successfully!');
     }
 
-    // public function edit($id)
-    // {
-    //     // $model = new ActivityModel();
-    //     $activity = $this->activityModel->find($id);
-
-    //     if (!$activity) {
-    //         return redirect()->to('activities')->with('error', 'Activity not found.');
-    //     }
-
-    //    return view('activities/edit', [
-    //         'page_title' => 'Edit Activity',
-    //         'activity'   => $activity,
-    //         // Pass the residents to populate checkboxes on edit layout too
-    //         'residents'  => $this->residentModel->where('is_active', 1)->orderBy('last_name', 'ASC')->findAll()
-    //     ]);
-    // }
     public function edit($id)
     {
         $activity = $this->activityModel->find($id);
@@ -224,5 +208,61 @@ class ActivitiesController extends BaseController
             return redirect()->to('activities')->with('success', 'Activity deleted successfully.');
         }
         return redirect()->to('activities')->with('error', 'Activity not found.');
+    }
+
+    public function show($id)
+    {
+        $activity = $this->activityModel->find($id);
+
+        if (!$activity) {
+            return redirect()->to('activities')->with('error', 'Activity log not found.');
+        }
+
+        $db = \Config\Database::connect();
+
+        // Fetch currently linked resident IDs for this activity
+        $linkedResidentRows = $db->table('activity_residents')
+                                ->where('activity_id', $id)
+                                ->select('resident_id')
+                                ->get()
+                                ->getResultArray();
+
+        $linkedResidentIds = array_column($linkedResidentRows, 'resident_id');
+
+        return view('activities/show', [
+            'page_title'        => 'Activity Distribution Profile',
+            'activity'          => $activity,
+            'residents'         => $this->residentModel->where('is_active', 1)->orderBy('last_name', 'ASC')->findAll(),
+            'linkedResidentIds' => $linkedResidentIds
+        ]);
+    }
+
+    public function saveDistribution($id)
+    {
+        $activity = $this->activityModel->find($id);
+        if (!$activity) {
+            return redirect()->to('activities')->with('error', 'Activity record not found.');
+        }
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('activity_residents');
+
+        // Wipe old recipient links for this specific activity to handle updates safely
+        $builder->where('activity_id', $id)->delete();
+
+        $selectedResidents = $this->request->getPost('resident_ids');
+        if (!empty($selectedResidents) && is_array($selectedResidents)) {
+            $linkages = [];
+            foreach ($selectedResidents as $resId) {
+                $linkages[] = [
+                    'activity_id' => $id,
+                    'resident_id' => $resId,
+                    'created_at'  => date('Y-m-d H:i:s')
+                ];
+            }
+            $builder->insertBatch($linkages);
+        }
+
+        return redirect()->to('activities/show/' . $id)->with('success', 'Distribution logs updated successfully!');
     }
 }

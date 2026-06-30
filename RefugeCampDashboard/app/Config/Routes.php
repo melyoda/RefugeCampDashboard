@@ -19,6 +19,9 @@ $routes->get('activities/edit/(:num)', 'ActivitiesController::edit/$1');
 $routes->post('activities/update/(:num)', 'ActivitiesController::update/$1');
 // $routes->get('activities/delete/(:num)', 'ActivitiesController::delete/$1');
 $routes->post('activities/delete/(:num)', 'ActivitiesController::delete/$1');
+// Activity Details and Distribution Tracking
+$routes->get('activities/show/(:num)', 'ActivitiesController::show/$1');
+$routes->post('activities/save-distribution/(:num)', 'ActivitiesController::saveDistribution/$1');
 
 //residents routes
 $routes->get('residents', 'ResidentsController::index');
