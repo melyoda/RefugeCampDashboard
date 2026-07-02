@@ -8,13 +8,17 @@
     </div>
 
     <?php if (session()->getFlashdata('success')) : ?>
-        <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+        <div class="alert alert-success shadow-sm"><?= session()->getFlashdata('success') ?></div>
     <?php endif; ?>
     <?php if (session()->getFlashdata('error')) : ?>
-        <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+        <div class="alert alert-danger shadow-sm"><?= session()->getFlashdata('error') ?></div>
     <?php endif; ?>
 
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="mb-0 h6 fw-bold">📋 Active Camp Roster</h5>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark">
@@ -28,7 +32,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($residents)): foreach ($residents as $r): ?>
+                    <?php if (!empty($active_residents)): foreach ($active_residents as $r): ?>
                         <tr>
                             <td class="font-monospace fw-bold small">
                                 <?= esc($r['document_id'] ?: '—') ?>
@@ -38,11 +42,7 @@
                                 <small class="text-muted"><?= esc($r['last_name']) ?>, <?= esc($r['first_name']) ?></small>
                             </td>
                             <td>
-                                <?php if ($r['is_active'] == 1): ?>
-                                    <span class="badge bg-success">Active</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary">Inactive / Left</span>
-                                <?php endif; ?>
+                                <span class="badge bg-success">Active</span>
                             </td>
                             <td>
                                 <div class="small"><strong>P:</strong> <?= esc($r['primary_phone'] ?? '—') ?></div>
@@ -67,7 +67,63 @@
                         </tr>
                     <?php endforeach; else: ?>
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">No resident records found in the engine database.</td>
+                            <td colspan="6" class="text-center text-muted py-4">No active verification records found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card border-warning shadow-sm">
+        <div class="card-header bg-warning text-dark py-3">
+            <h5 class="mb-0 h6 fw-bold">⚠️ Pending Approvals Checkbox Queue</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Registration ID</th>
+                        <th>Full Name</th>
+                        <th>Contacts</th>
+                        <th>Family Head Details</th>
+                        <th class="text-end">Triage Decision Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($pending_residents)): foreach ($pending_residents as $p): ?>
+                        <tr>
+                            <td class="font-monospace fw-bold small">
+                                <?= esc($p['document_id'] ?: '—') ?>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-warning-dark"><?= esc($p['full_name']) ?></div>
+                                <small class="text-muted"><?= esc($p['last_name']) ?>, <?= esc($p['first_name']) ?></small>
+                            </td>
+                            <td>
+                                <div class="small"><strong>P:</strong> <?= esc($p['primary_phone'] ?? '—') ?></div>
+                            </td>
+                            <td class="small">
+                                <div><strong>DOB:</strong> <?= esc($p['dob'] ?? '—') ?></div>
+                                <div><strong>Status:</strong> <?= esc($p['marital_status'] ?? '—') ?></div>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <form action="<?= base_url('residents/approve/' . $p['id']) ?>" method="POST" class="d-inline">
+                                        <?= csrf_field() ?>
+                                        <button type="submit" class="btn btn-sm btn-success px-3 fw-bold">Admit</button>
+                                    </form>
+
+                                    <form action="<?= base_url('residents/reject/' . $p['id']) ?>" method="POST" onsubmit="return confirm('Permanently reject and delete this application request?');" class="d-inline">
+                                        <?= csrf_field() ?>
+                                        <button type="submit" class="btn btn-sm btn-danger px-3">Reject</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">Clear skies! No pending self-registrations waiting in the triage queue.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

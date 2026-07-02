@@ -4,29 +4,22 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class ResidentModel extends Model
+class FamilyMemberModel extends Model
 {
-    protected $table            = 'residents';
+    protected $table            = 'family_members';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-   protected $allowedFields    = [
-        'document_id',
-        'access_code_hash',
-        'first_name',
-        'last_name',
+    protected $allowedFields    = [
+        'resident_id',
+        'relationship_type',
         'full_name',
         'dob',
+        'gender',
         'has_disability',
-        'disability_details',
-        'primary_phone',
-        'backup_phone',
-        'marital_status',
-        'children_count',
-        'notes',
-        'is_active'
+        'disability_details'
     ];
 
     protected bool $allowEmptyInserts = false;
