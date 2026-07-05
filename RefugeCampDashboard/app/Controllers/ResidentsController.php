@@ -215,4 +215,20 @@ class ResidentsController extends BaseController
         // Formats it cleanly as XXX-XXX for readability on printed slips
         return substr($code, 0, 3) . '-' . substr($code, 3, 3);
     }
+
+    public function approve($id)
+    {
+        $model = new ResidentModel();
+        $model->update($id, ['is_active' => 1]); // Changes status from pending to active
+
+        return redirect()->to('residents')->with('success', 'Resident approved and admitted into the camp roster.');
+    }
+
+    public function reject($id)
+    {
+        $model = new ResidentModel();
+        $model->delete($id); // Hard delete to purge the unapproved application request
+
+        return redirect()->to('residents')->with('success', 'Application rejected and data purged cleanly.');
+    }
 }
