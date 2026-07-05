@@ -31,7 +31,7 @@
                     ⚠️ CRITICAL: Take a screenshot of this page or copy your Access Code right now. You will need both your Registration ID and Access Code to check your portal status later!
                 </div>
 
-                <a href="<?= base_url('household-register') ?>" class="btn btn-outline-dark btn-sm">Submit Another Registration</a>
+                 <a href="<?= base_url('household/login') ?>" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">Proceed to Login Portal</a>
             </div>
         </div>
     </div>

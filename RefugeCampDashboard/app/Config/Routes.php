@@ -3,33 +3,33 @@
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
-// $routes->get('/', 'Home::index');
-//dashboard routes
 
-//public routes for registration
-// $routes->group('household-register', ['namespace' => 'App\Controllers'], function($routes) {
-//     $routes->get('/', 'RegisterController::index');
-//     $routes->post('save', 'RegisterController::save');
-// });
+// 1. Public Routes for Registration
 $routes->get('household-register', 'RegisterController::index');
 $routes->post('household-register/save', 'RegisterController::save');
 
-$routes->group('/', ['filter' => 'session'], function($routes){
-    $routes->get('/', 'DashboardController::index');
-    $routes->get('dashboard', 'DashboardController::index');
-});
+$routes->get('household/login', 'PortalController::login');
+$routes->post('household/auth', 'PortalController::auth');
+$routes->get('household/dashboard', 'PortalController::dashboard');
+$routes->get('household/logout', 'PortalController::logout');
 
-//authentication routes
+$routes->post('household/add-member', 'PortalController::addMember');
+$routes->post('household/remove-member/(:num)', 'PortalController::removeMember/$1');
+
+// 2. Authentication Routes (Shield handles its own internal routing)
 service('auth')->routes($routes);
 
-//activities routes
-$routes->group('activities', ['filter' => 'session'], function($routes) {
+// 3. Main Dashboard Routes
+$routes->get('/', 'DashboardController::index');
+$routes->get('dashboard', 'DashboardController::index');
+
+// 4. Protected Activities Routes
+$routes->group('activities', function($routes) {
     $routes->get('/', 'ActivitiesController::index');
     $routes->get('create', 'ActivitiesController::create');
     $routes->post('store', 'ActivitiesController::store');
     $routes->get('edit/(:num)', 'ActivitiesController::edit/$1');
     $routes->post('update/(:num)', 'ActivitiesController::update/$1');
-    // $routes->get('delete/(:num)', 'ActivitiesController::delete/$1');
     $routes->post('delete/(:num)', 'ActivitiesController::delete/$1');
 
     // Activity Details and Distribution Tracking
@@ -37,38 +37,22 @@ $routes->group('activities', ['filter' => 'session'], function($routes) {
     $routes->post('save-distribution/(:num)', 'ActivitiesController::saveDistribution/$1');
 });
 
-// $routes->get('activities', 'ActivitiesController::index');
-// $routes->get('activities/create', 'ActivitiesController::create');
-// $routes->post('activities/store', 'ActivitiesController::store');
-// $routes->get('activities/edit/(:num)', 'ActivitiesController::edit/$1');
-// $routes->post('activities/update/(:num)', 'ActivitiesController::update/$1');
-// // $routes->get('activities/delete/(:num)', 'ActivitiesController::delete/$1');
-// $routes->post('activities/delete/(:num)', 'ActivitiesController::delete/$1');
-// // Activity Details and Distribution Tracking
-// $routes->get('activities/show/(:num)', 'ActivitiesController::show/$1');
-// $routes->post('activities/save-distribution/(:num)', 'ActivitiesController::saveDistribution/$1');
-
-//residents routes
-$routes->group('residents', ['filter' => 'session'], function($routes) {
-    $routes->get('/', 'ResidentsController::index');
+// 5. Protected Residents Routes
+$routes->group('residents', function($routes) {
+$routes->get('/', 'ResidentsController::index');
     $routes->get('create', 'ResidentsController::create');
     $routes->post('store', 'ResidentsController::store');
     $routes->get('edit/(:num)', 'ResidentsController::edit/$1');
     $routes->post('update/(:num)', 'ResidentsController::update/$1');
     $routes->post('delete/(:num)', 'ResidentsController::delete/$1');
+
+    $routes->post('approve/(:num)', 'ResidentsController::approve/$1');
+    $routes->post('reject/(:num)', 'ResidentsController::reject/$1');
 });
 
-// $routes->get('residents', 'ResidentsController::index');
-// $routes->get('residents/create', 'ResidentsController::create');
-// $routes->post('residents/store', 'ResidentsController::store');
-// $routes->get('residents/edit/(:num)', 'ResidentsController::edit/$1');
-//$routes->post('residents/update Pis/(:num)', 'ResidentsController::update/$1');
-// $routes->post('residents/update/(:num)', 'ResidentsController::update/$1');
-// $routes->post('residents/delete/(:num)', 'ResidentsController::delete/$1');
-
-// Donations Ledger Routes
-$routes->group('donations', ['filter' => 'session'], function($routes) {
-   $routes->get('/', 'DonationsController::index');        // Maps to: /donations
-    $routes->get('create', 'DonationsController::create');  // Maps to: /donations/create
-    $routes->post('store', 'DonationsController::store');    // Maps to: /donations/store
+// 6. Protected Donations Ledger Routes
+$routes->group('donations', function($routes) {
+    $routes->get('/', 'DonationsController::index');
+    $routes->get('create', 'DonationsController::create');
+    $routes->post('store', 'DonationsController::store');
 });

@@ -10,7 +10,7 @@ class RegisterController extends Controller
 {
     public function index()
     {
-        return view('register');
+        return view('users/register');
     }
 
     public function save()
@@ -69,7 +69,7 @@ class RegisterController extends Controller
         if (!empty($incomingMembers) && $residentId) {
             foreach ($incomingMembers as $member) {
                 // Safeguard against empty dynamic rows
-                if (empty($member['full_name'])) continue; 
+                if (empty($member['full_name'])) continue;
 
                 $familyModel->save([
                     'resident_id'        => $residentId,
@@ -84,7 +84,7 @@ class RegisterController extends Controller
         }
 
         // 6. Direct to a registration confirmation page displaying their generated credentials
-        return view('registration_success', [
+        return view('users/registration_success', [
             'name' => $residentData['full_name'],
             'id'   => $residentData['document_id'],
             'code' => $plainAccessCode

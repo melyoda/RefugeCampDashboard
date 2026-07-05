@@ -35,39 +35,6 @@ class ResidentsController extends BaseController
         return view('residents/create', ['title' => 'Enroll New Resident']);
     }
 
-    /**
-     * Stores enrollment payload
-     */
-    // public function store()
-    // {
-    //     $rules = [
-    //         'first_name' => 'required|min_length[2]|max_length[100]',
-    //         'last_name'  => 'required|min_length[2]|max_length[100]',
-
-    //         'document_id'    => 'required|min_length[3]|max_length[100]|is_unique[residents.document_id,id,{id}]',
-    //         'primary_phone'  => 'required|min_length[7]|max_length[20]',
-    //     ];
-
-    //     if (!$this->validate($rules)) {
-    //         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-    //     }
-
-    //     $model = new ResidentModel();
-    //     $model->save([
-    //         'document_id' => $this->request->getPost('document_id') ?: null,
-    //         'first_name'     => $this->request->getPost('first_name'),
-    //         'last_name'      => $this->request->getPost('last_name'),
-    //         'full_name'      => $this->request->getPost('full_name'),
-    //         'primary_phone'  => $this->request->getPost('primary_phone'),
-    //         'backup_phone'   => $this->request->getPost('backup_phone'),
-    //         'marital_status' => $this->request->getPost('marital_status'),
-    //         'children_count' => $this->request->getPost('children_count') !== '' ? $this->request->getPost('children_count') : 0,
-    //         'notes'          => $this->request->getPost('notes'),
-    //         'is_active'      => 1
-    //     ]);
-
-    //     return redirect()->to('residents')->with('success', 'Resident enrolled successfully.');
-    // }
     public function store()
     {
         $rules = [
@@ -161,10 +128,12 @@ class ResidentsController extends BaseController
         }
 
         $rules = [
+            'document_id' => "required|is_unique[residents.document_id,id,{$id}]",
+            // 'document_id'    => 'required|min_length[3]|max_length[100]|is_unique[residents.document_id,id,{id}]',
+
             'first_name' => 'required|min_length[2]|max_length[100]',
             'last_name'  => 'required|min_length[2]|max_length[100]',
 
-            'document_id'    => 'required|min_length[3]|max_length[100]|is_unique[residents.document_id,id,{id}]',
             'primary_phone'  => 'required|min_length[7]|max_length[20]',
         ];
 
