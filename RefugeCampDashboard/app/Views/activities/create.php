@@ -71,6 +71,10 @@ Log a New Camp Activity
 
                     <div class="d-flex justify-content-between align-items-center">
                         <a href="<?= base_url('activities') ?>" class="btn btn-light border btn-sm">Cancel & Return</a>
+                        <button type="submit" class="btn btn-success btn-sm px-4">Save Entry</button>
+                    </div>
+
+                    <!-- remove later and put somewhere else that makes sense -->
                         <div class="mb-3 card p-3 border-0 shadow-sm">
                             <label class="form-label fw-bold mb-1">Benefiting Residents <span class="text-muted small fw-normal">(Optional — check off individuals who directly received items/care)</span></label>
                             <small class="text-muted d-block mb-2">Leave blank if this is a general camp expense (e.g., site repairs, common water tank refill).</small>
@@ -89,11 +93,9 @@ Log a New Camp Activity
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success btn-sm px-4">Save Entry</button>
-                    </div>
                 </form>
-
             </div>
+
         </div>
     </div>
 </div>
