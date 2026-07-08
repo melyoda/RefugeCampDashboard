@@ -78,6 +78,7 @@ class Filters extends BaseFilters
             'session' => ['except' => [
                 'household-register',
                 'household-register/*',
+                'household/*',
                 'login*',
                 // 'logout',
                 'register*',

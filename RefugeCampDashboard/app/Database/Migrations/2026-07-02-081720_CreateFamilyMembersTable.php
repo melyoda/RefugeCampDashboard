@@ -52,6 +52,7 @@ class CreateFamilyMembersTable extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
+            //should add delted at later for soft delete
         ]);
 
         $this->forge->addKey('id', true);

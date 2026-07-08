@@ -1,6 +1,48 @@
 <?= $this->extend('layouts/dashboard') ?>
 
 <?= $this->section('content') ?>
+
+<?php if (session()->getFlashdata('success_modal')) : ?>
+    <?php $modalData = session()->getFlashdata('success_modal'); ?>
+
+    <div class="modal fade" id="enrollmentSuccessModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="enrollmentSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold h6" id="enrollmentSuccessModalLabel">🎉 Direct Enrollment Successful</h5>
+                </div>
+                <div class="modal-body bg-white p-4 text-center">
+                    <p class="text-muted small mb-3">
+                        A profile has been created for <strong><?= esc($modalData['name']) ?></strong> (ID: <?= esc($modalData['id']) ?>).
+                    </p>
+
+                    <div class="p-3 rounded mb-3 border" style="background-color: #f8f9fa;">
+                        <span class="text-muted d-block small font-monospace uppercase">RESIDENT PORTAL ACCESS CODE</span>
+                        <strong class="fs-3 text-primary font-monospace d-block my-2 tracking-wider"><?= esc($modalData['code']) ?></strong>
+                        <button type="button" class="btn btn-sm btn-outline-secondary px-3" onclick="navigator.clipboard.writeText('<?= esc($modalData['code']) ?>'); alert('Access code copied to clipboard!');">
+                            📋 Copy Code
+                        </button>
+                    </div>
+
+                    <div class="alert alert-warning border-0 small text-start mb-0">
+                        <strong>⚠️ Notice for Administration:</strong> Please copy down or print this code layout right now. For structural safety, this credential is cryptographically hidden and **cannot be retrieved or viewed again** once this window is closed.
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-sm btn-dark px-4 fw-bold" data-bs-dismiss="modal">I Have Saved The Code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var successModal = new bootstrap.Modal(document.getElementById('enrollmentSuccessModal'));
+            successModal.show();
+        });
+    </script>
+<?php endif; ?>
+
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h4 text-dark mb-0">Residents Registry</h2>

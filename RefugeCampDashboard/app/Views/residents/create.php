@@ -4,7 +4,7 @@
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-lg-9 mx-auto">
-            
+
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="h4 text-dark mb-0">Direct Administrative Enrollment</h2>
                 <a href="<?= base_url('residents') ?>" class="btn btn-outline-secondary btn-sm">← Return to Registry</a>
@@ -62,7 +62,7 @@
                                 <option value="Divorced" <?= old('marital_status') === 'Divorced' ? 'selected' : '' ?>>Divorced</option>
                             </select>
                         </div>
-                        
+
                         <div class="col-12">
                             <div class="form-check form-switch my-2">
                                 <input class="form-check-input" type="checkbox" name="has_disability" value="1" id="headDisability" <?= old('has_disability') ? 'checked' : '' ?> onchange="document.getElementById('headDisabilityDetails').classList.toggle('d-none', !this.checked)">
@@ -108,7 +108,7 @@ function addFamilyMember(type) {
     if (notice) notice.remove();
 
     const container = document.getElementById('familyMembersContainer');
-    
+
     const html = `
         <li class="list-group-item bg-white p-3 border-bottom position-relative member-item">
             <div class="row g-2 align-items-center">
@@ -117,7 +117,7 @@ function addFamilyMember(type) {
                     <button type="button" class="btn-close" onclick="this.closest('.member-item').remove()"></button>
                 </div>
                 <input type="hidden" name="members[${memberIndex}][relationship_type]" value="${type}">
-                
+
                 <div class="col-md-4">
                     <input type="text" name="members[${memberIndex}][full_name]" class="form-control form-control-sm" placeholder="Full Name" required>
                 </div>
@@ -143,7 +143,7 @@ function addFamilyMember(type) {
             </div>
         </li>
     `;
-    
+
     container.insertAdjacentHTML('beforeend', html);
     memberIndex++;
 }

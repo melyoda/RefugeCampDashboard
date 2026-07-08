@@ -80,7 +80,7 @@
                                     <td><?= esc($dep['dob']) ?></td>
                                     <td>
                                         <?php if ($dep['has_disability']): ?>
-                                            <span class="text-danger border border-danger rounded px-1 d-inline-block small" title="<?= esc($dep['disability_details']) ?>">⚠️ Support Needed</span>
+                                            <span class="text-danger border border-danger rounded px-1 d-inline-block small" title="<?= esc($dep['disability_details']) ?>"> Support Needed</span>
                                         <?php else: ?>
                                             <span class="text-muted">Normal</span>
                                         <?php endif; ?>
@@ -99,6 +99,48 @@
                             <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <div class="w-100 mt-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
+                        <span>Your Distribution & Assistance Log</span>
+                        <span class="badge bg-secondary font-monospace small">History Log</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date Received</th>
+                                    <th>Item / Activity Name</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($history)): foreach ($history as $log): ?>
+                                    <tr>
+                                        <td class="text-nowrap"><?= date('Y-m-d H:i', strtotime($log['created_at'])) ?></td>
+                                        <td>
+                                            <span class="fw-bold d-block"><?= esc($log['title']) ?></span>
+                                            <?php if ($log['is_distributed_aid'] == 1): ?>
+                                                <span class="badge bg-success py-0 px-2 mt-1" style="font-size: 0.75rem;">Distributed Aid</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <span class="text-capitalize badge bg-light text-dark border"><?= esc($log['aid_category'] ?? 'General') ?></span>
+                                        </td>
+                                        <td class="text-muted"><?= esc($log['description'] ?: 'No details provided.') ?></td>
+                                    </tr>
+                                <?php endforeach; else: ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">No recorded assistance distributions or logged activity links found for your profile profile yet.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
