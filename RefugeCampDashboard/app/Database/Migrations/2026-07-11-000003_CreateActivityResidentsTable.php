@@ -32,15 +32,17 @@ class CreateActivityResidentsTable extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-
-        // Performance indexing for matching bidirectional lookups
         $this->forge->addKey(['activity_id', 'resident_id']);
+
+        // Added formal foreign keys to keep Aiven clean
+        $this->forge->addForeignKey('activity_id', 'activities', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('resident_id', 'residents', 'id', 'CASCADE', 'CASCADE');
 
         $this->forge->createTable('activity_residents');
     }
 
     public function down()
     {
-       $this->forge->dropTable('activity_residents');
+        $this->forge->dropTable('activity_residents');
     }
 }

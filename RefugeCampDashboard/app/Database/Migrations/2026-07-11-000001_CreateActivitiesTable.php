@@ -6,8 +6,8 @@ use CodeIgniter\Database\Migration;
 
 class CreateActivitiesTable extends Migration
 {
-    public function up(){
-
+    public function up()
+    {
         $this->forge->addField([
             'id' => [
                 'type'           => 'INT',
@@ -33,6 +33,16 @@ class CreateActivitiesTable extends Migration
                 'constraint' => '255',
                 'null'       => true,
             ],
+            'is_distributed_aid' => [
+                'type'       => 'TINYINT',
+                'constraint' => 1,
+                'default'    => 0,
+            ],
+            'aid_category' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 100,
+                'null'       => true,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -49,6 +59,6 @@ class CreateActivitiesTable extends Migration
 
     public function down()
     {
-       $this->forge->dropTable('activities');
+        $this->forge->dropTable('activities');
     }
 }

@@ -8,7 +8,7 @@ class CreateDonationsTable extends Migration
 {
     public function up()
     {
-       $this->forge->addField([
+        $this->forge->addField([
             'id' => [
                 'type'           => 'INT',
                 'constraint'     => 11,
@@ -17,7 +17,7 @@ class CreateDonationsTable extends Migration
             ],
             'donor_name' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '255', // e.g., "UNHCR", "Red Cross", or "Anonymous"
+                'constraint' => '255',
             ],
             'amount' => [
                 'type'       => 'DECIMAL',
@@ -51,6 +51,6 @@ class CreateDonationsTable extends Migration
 
     public function down()
     {
-       $this->forge->dropTable('donations');
+        $this->forge->dropTable('donations');
     }
 }

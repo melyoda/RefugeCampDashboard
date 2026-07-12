@@ -8,7 +8,7 @@ class CreateFamilyMembersTable extends Migration
 {
     public function up()
     {
-       $this->forge->addField([
+        $this->forge->addField([
             'id' => [
                 'type'           => 'INT',
                 'constraint'     => 11,
@@ -52,11 +52,13 @@ class CreateFamilyMembersTable extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
-            //should add delted at later for soft delete
+            'deleted_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
         ]);
 
         $this->forge->addKey('id', true);
-        // Add a Foreign Key constraint: if a resident profile is permanently deleted, their family table records clear automatically
         $this->forge->addForeignKey('resident_id', 'residents', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('family_members');
     }

@@ -8,12 +8,22 @@ class CreateResidentsTable extends Migration
 {
     public function up()
     {
-       $this->forge->addField([
+        $this->forge->addField([
             'id' => [
                 'type'           => 'INT',
                 'constraint'     => 11,
                 'unsigned'       => true,
                 'auto_increment' => true,
+            ],
+            'document_id' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '100',
+                'null'       => true,
+            ],
+            'access_code_hash' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+                'null'       => true,
             ],
             'first_name' => [
                 'type'       => 'VARCHAR',
@@ -25,7 +35,20 @@ class CreateResidentsTable extends Migration
             ],
             'full_name' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '255', // Broad bucket to hold 3-4 multi-part tribal or generational names
+                'constraint' => '255',
+            ],
+            'dob' => [
+                'type' => 'DATE',
+                'null' => true,
+            ],
+            'has_disability' => [
+                'type'       => 'TINYINT',
+                'constraint' => 1,
+                'default'    => 0,
+            ],
+            'disability_details' => [
+                'type' => 'TEXT',
+                'null' => true,
             ],
             'primary_phone' => [
                 'type'       => 'VARCHAR',
@@ -40,7 +63,7 @@ class CreateResidentsTable extends Migration
             'marital_status' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '100',
-                'null'       => true, // Optional: Single, Married, Widowed, Multiple Wives, etc.
+                'null'       => true,
             ],
             'children_count' => [
                 'type'       => 'INT',
