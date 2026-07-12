@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: refugee-camp-dashboard
-    runtime: php
-    buildCommand: composer install --no-dev --optimize-autoloader
-    startCommand: apache2-foreground
-    publishDir: public
