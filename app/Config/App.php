@@ -20,7 +20,7 @@ class App extends BaseConfig
 // Grabs the live URL from Render env, or falls back to localhost if testing at home
     public string $baseURL = '';
 
-    public function __construct()
+    // public function __construct()
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
