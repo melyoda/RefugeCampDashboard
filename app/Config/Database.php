@@ -199,6 +199,18 @@ class Database extends Config
         // we don't overwrite live data on accident.
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';
+        } else {
+            // 1. Force the incoming environment port string into a proper integer 
+            // so MySQLi doesn't reset it back to 3306.
+            if (isset($this->default['port'])) {
+                $this->default['port'] = (int) $this->default['port'];
+            }
+
+            // 2. Change 'encrypt' from a boolean 'false' into an array 
+            // container so it can safely read your SSL certificate path.
+            $this->default['encrypt'] = [
+                'ssl_ca' => file_exists('/etc/secrets/ca.pem') ? '/etc/secrets/ca.pem' : null,
+            ];
         }
     }
 }
