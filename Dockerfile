@@ -25,10 +25,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy application files
-COPY dashboard/ /var/www/html/
+COPY RefugeCampDashboard/ /var/www/html/
 
 # Copy the SSL cert if you have it in your project
-# COPY dashboard/certs/ /var/www/html/certs/
+# COPY RefugeCampDashboard/certs/ /var/www/html/certs/
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
@@ -41,6 +41,6 @@ RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 # Copy environment file
-COPY dashboard/.env /var/www/html/.env
+COPY RefugeCampDashboard/.env /var/www/html/.env
 
 EXPOSE 80
