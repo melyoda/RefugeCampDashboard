@@ -16,7 +16,11 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost:8080/';
+    // public string $baseURL = 'http://localhost:8080/';
+// Grabs the live URL from Render env, or falls back to localhost if testing at home
+    public string $baseURL = '';
+
+    public function __construct()
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
@@ -199,4 +203,12 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Dynamically override the baseURL using Render's app.baseURL variable
+        $this->baseURL = env('app.baseURL', 'http://localhost:8080/');
+    }
 }
