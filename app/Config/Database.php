@@ -194,22 +194,20 @@ class Database extends Config
     {
         parent::__construct();
 
-        // Ensure that we always set the database group to 'tests' if
-        // we are currently running an automated test suite, so that
-        // we don't overwrite live data on accident.
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';
         } else {
-            // 1. Force the incoming environment port string into a proper integer 
-            // so MySQLi doesn't reset it back to 3306.
-            if (isset($this->default['port'])) {
-                $this->default['port'] = (int) $this->default['port'];
-            }
+            // Read the clean uppercase environment variables safely
+            $this->default['hostname'] = env('DB_HOSTNAME', 'localhost');
+            $this->default['username'] = env('DB_USERNAME', 'root');
+            $this->default['password'] = env('DB_PASSWORD', '');
+            $this->default['database'] = env('DB_DATABASE', 'defaultdb');
+            $this->default['port']     = (int) env('DB_PORT', 3306);
 
-            // 2. Change 'encrypt' from a boolean 'false' into an array 
-            // container so it can safely read your SSL certificate path.
+            // Point directly to the permission-fixed certificate copy
+            $targetCert = '/var/www/html/writable/ca.pem';
             $this->default['encrypt'] = [
-                'ssl_ca' => file_exists('/etc/secrets/ca.pem') ? '/etc/secrets/ca.pem' : null,
+                'ssl_ca' => file_exists($targetCert) ? $targetCert : null,
             ];
         }
     }
