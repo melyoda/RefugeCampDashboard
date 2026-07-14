@@ -34,5 +34,8 @@ RUN chown -R www-data:www-data /var/www/html/writable
 # Expose the default container web port
 EXPOSE 80
 
-# RUNTIME FIX: When container boots, copy the cert to a place www-data can read, change ownership, and start Apache
-CMD ["sh", "-c", "mkdir -p /var/www/html/writable && cp /etc/secrets/ca.pem /var/www/html/writable/ca.pem && chown -R www-data:www-data /var/www/html/writable && apache2-foreground"]
+# # RUNTIME FIX: When container boots, copy the cert to a place www-data can read, change ownership, and start Apache
+# CMD ["sh", "-c", "mkdir -p /var/www/html/writable && cp /etc/secrets/ca.pem /var/www/html/writable/ca.pem && chown -R www-data:www-data /var/www/html/writable && apache2-foreground"]
+
+# RUNTIME FIX: Dump system environment variables into Apache config pool, copy cert, and boot Apache
+CMD ["sh", "-c", "mkdir -p /var/www/html/writable && cp /etc/secrets/ca.pem /var/www/html/writable/ca.pem && chown -R www-data:www-data /var/www/html/writable && env | grep -E '^(DATABASE_|CI_)' >> /etc/apache2/envvars && apache2-foreground"]
