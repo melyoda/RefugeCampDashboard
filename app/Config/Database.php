@@ -26,24 +26,22 @@ class Database extends Config
      */
     public array $default = [
         'DSN'          => '',
-        'hostname'     => getenv('DATABASE_DEFAULT_HOSTNAME') ?: 'localhost',
-        'username'     => getenv('DATABASE_DEFAULT_USERNAME') ?: 'root',
-        'password'     => getenv('DATABASE_DEFAULT_PASSWORD') ?: '',
-        'database'     => getenv('DATABASE_DEFAULT_DATABASE') ?: 'database',
-        'DBDriver'     => getenv('DATABASE_DEFAULT_DBDRIVER') ?: 'MySQLi',
+        'hostname'     => 'localhost',
+        'username'     => '',
+        'password'     => '',
+        'database'     => '',
+        'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
         'DBDebug'      => true,
         'charset'      => 'utf8mb4',
         'DBCollat'     => 'utf8mb4_general_ci',
         'swapPre'      => '',
-        'encrypt'      => getenv('DATABASE_DEFAULT_ENCRYPT')
-                        ? json_decode(getenv('DATABASE_DEFAULT_ENCRYPT'), true)
-                        : false,
+        'encrypt'      => false,
         'compress'     => false,
         'strictOn'     => false,
         'failover'     => [],
-        'port'         => getenv('DATABASE_DEFAULT_PORT') ? (int)getenv('DATABASE_DEFAULT_PORT') : 3306,
+        'port'         => 3306,
         'numberNative' => false,
         'foundRows'    => false,
         'dateFormat'   => [
@@ -225,25 +223,39 @@ class Database extends Config
 
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';
+        }else {
+            // Safely map individual string variables
+            if ($hostname = getenv('DATABASE_DEFAULT_HOSTNAME')) {
+                $this->default['hostname'] = $hostname;
+            }
+            if ($username = getenv('DATABASE_DEFAULT_USERNAME')) {
+                $this->default['username'] = $username;
+            }
+            if ($password = getenv('DATABASE_DEFAULT_PASSWORD')) {
+                $this->default['password'] = $password;
+            }
+            if ($database = getenv('DATABASE_DEFAULT_DATABASE')) {
+                $this->default['database'] = $database;
+            }
+            if ($dbDriver = getenv('DATABASE_DEFAULT_DBDRIVER')) {
+                $this->default['DBDriver'] = $dbDriver;
+            }
+            if ($port = getenv('DATABASE_DEFAULT_PORT')) {
+                $this->default['port'] = (int)$port;
+            }
         }
-        //  else {
-        //     // Read the clean uppercase environment variables safely
-        //     $this->default['hostname'] = env('DB_HOSTNAME', 'localhost');
-        //     $this->default['username'] = env('DB_USERNAME', 'root');
-        //     $this->default['password'] = env('DB_PASSWORD', '');
-        //     $this->default['database'] = env('DB_DATABASE', 'defaultdb');
-        //     $this->default['port']     = (int) env('DB_PORT', 3306);
 
-        //     // Point directly to the permission-fixed certificate copy
-        //     $targetCert = '/var/www/html/writable/ca.pem';
-        //     $this->default['encrypt'] = [
-        //         'ssl_ca' => file_exists($targetCert) ? $targetCert : null,
-        //     ];
+        // Safely parse your complex JSON string for SSL encryption configuration
+        if ($encryptJson = getenv('DATABASE_DEFAULT_ENCRYPT')) {
+            $decoded = json_decode($encryptJson, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $this->default['encrypt'] = $decoded;
+            }
+        }
+
+        // $array = json_decode($this->default['encrypt'], true);
+        // if (is_array($array)) {
+        //     $this->default['encrypt'] = $array;
         // }
-
-        $array = json_decode($this->default['encrypt'], true);
-        if (is_array($array)) {
-            $this->default['encrypt'] = $array;
-        }
     }
 }
