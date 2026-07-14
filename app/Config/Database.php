@@ -26,22 +26,24 @@ class Database extends Config
      */
     public array $default = [
         'DSN'          => '',
-        'hostname'     => 'localhost',
-        'username'     => '',
-        'password'     => '',
-        'database'     => '',
-        'DBDriver'     => 'MySQLi',
+        'hostname'     => getenv('DATABASE_DEFAULT_HOSTNAME') ?: 'localhost',
+        'username'     => getenv('DATABASE_DEFAULT_USERNAME') ?: 'root',
+        'password'     => getenv('DATABASE_DEFAULT_PASSWORD') ?: '',
+        'database'     => getenv('DATABASE_DEFAULT_DATABASE') ?: 'database',
+        'DBDriver'     => getenv('DATABASE_DEFAULT_DBDRIVER') ?: 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
         'DBDebug'      => true,
         'charset'      => 'utf8mb4',
         'DBCollat'     => 'utf8mb4_general_ci',
         'swapPre'      => '',
-        'encrypt'      => false,
+        'encrypt'      => getenv('DATABASE_DEFAULT_ENCRYPT')
+                        ? json_decode(getenv('DATABASE_DEFAULT_ENCRYPT'), true)
+                        : false,
         'compress'     => false,
         'strictOn'     => false,
         'failover'     => [],
-        'port'         => 3306,
+        'port'         => getenv('DATABASE_DEFAULT_PORT') ? (int)getenv('DATABASE_DEFAULT_PORT') : 3306,
         'numberNative' => false,
         'foundRows'    => false,
         'dateFormat'   => [
