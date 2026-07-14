@@ -209,6 +209,20 @@ class App extends BaseConfig
         parent::__construct();
 
         // Dynamically override the baseURL using Render's app.baseURL variable
-        $this->baseURL = env('app.baseURL', 'http://localhost:8080/');
+        // $this->baseURL = env('app.baseURL', 'http://localhost:8080/');
+
+        if (isset($_SERVER['HTTP_HOST'])) {
+            // Check if Render (or any proxy) forwarded the request as HTTPS
+            $isSecure = (
+                (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+                (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+            );
+
+                $protocol = $isSecure ? 'https' : 'http';
+                $this->baseURL = $protocol . '://' . $_SERVER['HTTP_HOST'] . '/';
+            } else {
+                // Fallback for CLI/terminal commands (like spark)
+                $this->baseURL = env('app.baseURL', 'http://localhost:8080/');
+        }
     }
 }
