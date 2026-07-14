@@ -25,6 +25,33 @@ class Database extends Config
      * @var array<string, mixed>
      */
     public array $default = [
+        'DSN'          => '//refugee-camp-db-albraas-project-dee1.b.aivencloud.com:20408/defaultdb',
+        'hostname'     => 'localhost',
+        'username'     => '',
+        'password'     => '',
+        'database'     => '',
+        'DBDriver'     => 'MySQLi',
+        'DBPrefix'     => '',
+        'pConnect'     => false,
+        'DBDebug'      => true,
+        'charset'      => 'utf8mb4',
+        'DBCollat'     => 'utf8mb4_general_ci',
+        'swapPre'      => '',
+        'encrypt'      => false,
+        'compress'     => false,
+        'strictOn'     => false,
+        'failover'     => [],
+        'port'         => 3306,
+        'numberNative' => false,
+        'foundRows'    => false,
+        'dateFormat'   => [
+            'date'     => 'Y-m-d',
+            'datetime' => 'Y-m-d H:i:s',
+            'time'     => 'H:i:s',
+        ],
+    ];
+
+    public array $test = [
         'DSN'          => '',
         'hostname'     => 'localhost',
         'username'     => '',
@@ -211,5 +238,10 @@ class Database extends Config
         //         'ssl_ca' => file_exists($targetCert) ? $targetCert : null,
         //     ];
         // }
+
+        $array = json_decode($this->default['encrypt'], true);
+        if (is_array($array)) {
+            $this->default['encrypt'] = $array;
+        }
     }
 }
