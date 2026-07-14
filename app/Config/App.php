@@ -18,7 +18,7 @@ class App extends BaseConfig
      */
     // public string $baseURL = 'http://localhost:8080/';
 // Grabs the live URL from Render env, or falls back to localhost if testing at home
-    public string $baseURL = '';
+    public string $baseURL = 'https://refugecampdashboard.onrender.com/';
 
     // public function __construct()
 
