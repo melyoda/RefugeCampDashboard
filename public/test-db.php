@@ -11,8 +11,9 @@ $host = getenv('database.default.hostname');
 $user = getenv('database.default.username');
 $pass = getenv('database.default.password');
 $db   = getenv('database.default.database');
-$port = getenv('database.default.port');
-$cert = getenv('database.default.encrypt.ssl_ca');
+$port = (int) getenv('database.default.port');
+$cert = getenv('database.default.ssl_ca');
+
 
 echo "Host: " . ($host ?: "NOT FOUND") . "<br>";
 echo "User: " . ($user ?: "NOT FOUND") . "<br>";

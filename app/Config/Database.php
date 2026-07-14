@@ -196,19 +196,20 @@ class Database extends Config
 
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';
-        } else {
-            // Read the clean uppercase environment variables safely
-            $this->default['hostname'] = env('DB_HOSTNAME', 'localhost');
-            $this->default['username'] = env('DB_USERNAME', 'root');
-            $this->default['password'] = env('DB_PASSWORD', '');
-            $this->default['database'] = env('DB_DATABASE', 'defaultdb');
-            $this->default['port']     = (int) env('DB_PORT', 3306);
-
-            // Point directly to the permission-fixed certificate copy
-            $targetCert = '/var/www/html/writable/ca.pem';
-            $this->default['encrypt'] = [
-                'ssl_ca' => file_exists($targetCert) ? $targetCert : null,
-            ];
         }
+        //  else {
+        //     // Read the clean uppercase environment variables safely
+        //     $this->default['hostname'] = env('DB_HOSTNAME', 'localhost');
+        //     $this->default['username'] = env('DB_USERNAME', 'root');
+        //     $this->default['password'] = env('DB_PASSWORD', '');
+        //     $this->default['database'] = env('DB_DATABASE', 'defaultdb');
+        //     $this->default['port']     = (int) env('DB_PORT', 3306);
+
+        //     // Point directly to the permission-fixed certificate copy
+        //     $targetCert = '/var/www/html/writable/ca.pem';
+        //     $this->default['encrypt'] = [
+        //         'ssl_ca' => file_exists($targetCert) ? $targetCert : null,
+        //     ];
+        // }
     }
 }

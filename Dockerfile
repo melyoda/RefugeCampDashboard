@@ -32,7 +32,6 @@ RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available
 RUN chown -R www-data:www-data /var/www/html/writable
 
 # Expose the default container web port
-# Expose the default container web port
 EXPOSE 80
 
 # RUNTIME FIX: When container boots, copy the cert to a place www-data can read, change ownership, and start Apache
