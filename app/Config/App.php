@@ -209,6 +209,6 @@ class App extends BaseConfig
         parent::__construct();
 
         // Dynamically override the baseURL using Render's app.baseURL variable
-        $this->baseURL = env('app.baseURL', 'http://localhost:8080/');
+        $this->baseURL = env('app.baseURL', 'https://refugecampdashboard.onrender.com/');
     }
 }
