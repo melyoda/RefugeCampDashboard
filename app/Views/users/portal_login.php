@@ -41,7 +41,7 @@
             </div>
 
             <div class="text-center mt-3">
-                <a href="<?= base_url('household-register') ?>" class="small text-muted text-decoration-none">← Need to register a new household?</a>
+                <a href="<?= base_url('household/household-register') ?>" class="small text-muted text-decoration-none">← Need to register a new household?</a>
             </div>
 
         </div>

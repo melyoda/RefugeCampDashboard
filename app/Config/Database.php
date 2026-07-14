@@ -25,7 +25,7 @@ class Database extends Config
      * @var array<string, mixed>
      */
     public array $default = [
-        'DSN'          => '//refugee-camp-db-albraas-project-dee1.b.aivencloud.com:20408/defaultdb',
+        'DSN'          => '',
         'hostname'     => 'localhost',
         'username'     => '',
         'password'     => '',

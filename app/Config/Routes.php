@@ -5,17 +5,22 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 
 // 1. Public Routes for Registration
-$routes->get('household-register', 'RegisterController::index');
-$routes->post('household-register/save', 'RegisterController::save');
+// $routes->get('household-register', 'RegisterController::index');
+// $routes->post('household-register/save', 'RegisterController::save');
 
-$routes->get('household/login', 'PortalController::login');
-$routes->post('household/auth', 'PortalController::auth');
-$routes->get('household/dashboard', 'PortalController::dashboard');
-$routes->get('household/logout', 'PortalController::logout');
+$routes->group('household', function($routes) {
+    $routes->get('household-register', 'RegisterController::index');
+    $routes->post('household-register/save', 'RegisterController::save');
 
-$routes->post('household/add-member', 'PortalController::addMember');
-$routes->post('household/remove-member/(:num)', 'PortalController::removeMember/$1');
+    $routes->get('/', 'PortalController::login');
+    $routes->get('login', 'PortalController::login');
+    $routes->post('auth', 'PortalController::auth');
+    $routes->get('dashboard', 'PortalController::dashboard');
+    $routes->get('logout', 'PortalController::logout');
 
+    $routes->post('add-member', 'PortalController::addMember');
+    $routes->post('remove-member/(:num)', 'PortalController::removeMember/$1');
+});
 // 2. Authentication Routes (Shield handles its own internal routing)
 service('auth')->routes($routes);
 

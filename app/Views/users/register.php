@@ -27,7 +27,7 @@
                 </div>
             <?php endif; ?>
 
-            <form action="<?= base_url('household-register/save') ?>" method="POST" id="registrationForm">
+            <form action="<?= base_url('household/household-register/save') ?>" method="POST" id="registrationForm">
                 <?= csrf_field() ?>
 
                 <div class="card shadow-sm border-0 mb-4">
