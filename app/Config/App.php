@@ -209,6 +209,15 @@ class App extends BaseConfig
         parent::__construct();
 
         // Dynamically override the baseURL using Render's app.baseURL variable
-        $this->baseURL = env('app.baseURL', 'https://refugecampdashboard.onrender.com/');
+        // $this->baseURL = env('app.baseURL', 'https://refugecampdashboard.onrender.com/');
+
+    if (isset($_SERVER['HTTP_HOST'])) {
+    // Automatically detect if we are using HTTP or HTTPS
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $this->baseURL = $protocol . '://' . $_SERVER['HTTP_HOST'] . '/';
+        } else {
+            // Fallback for CLI/terminal commands (like spark)
+            $this->baseURL = env('app.baseURL', 'http://localhost:8080/');
+        }
     }
 }
