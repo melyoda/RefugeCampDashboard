@@ -119,12 +119,22 @@ class RegisterController extends Controller
      */
     private function savePrimaryResident(int $childrenCount, string $plainAccessCode): int
     {
+        $firstName       = trim($this->request->getPost('first_name'));
+        $fatherName      = trim($this->request->getPost('father_name'));
+        $grandfatherName = trim($this->request->getPost('grandfather_name'));
+        $lastName        = trim($this->request->getPost('last_name'));
+
+        // Concatenate 4 parts into full_name
+        $fullName = preg_replace('/\s+/', ' ', "{$firstName} {$fatherName} {$grandfatherName} {$lastName}");
+
         $residentData = [
             'document_id'        => $this->request->getPost('document_id'),
             'access_code_hash'   => password_hash($plainAccessCode, PASSWORD_BCRYPT),
-            'first_name'         => $this->request->getPost('first_name'),
-            'last_name'          => $this->request->getPost('last_name'),
-            'full_name'          => trim($this->request->getPost('first_name') . ' ' . $this->request->getPost('last_name')),
+            'first_name'         => $firstName,
+            'father_name'        => $fatherName,
+            'grandfather_name'   => $grandfatherName,
+            'last_name'          => $lastName,
+            'full_name'          => $fullName,
             'dob'                => $this->request->getPost('dob'),
             'primary_phone'      => $this->request->getPost('primary_phone'),
             'backup_phone'       => $this->request->getPost('backup_phone') ?: null,
@@ -140,21 +150,41 @@ class RegisterController extends Controller
     }
 
     /**
-     * Populates supporting child structural array blocks to sub-table
+     * Populates supporting dynamic family members (Spouse/Child) to sub-table
      */
     private function saveFamilyMembers(int $residentId, array $members): void
     {
+        // Extract Head of Household's names for constructing children's names
+        $headFirstName  = trim($this->request->getPost('first_name'));
+        $headFatherName = trim($this->request->getPost('father_name'));
+        $headLastName   = trim($this->request->getPost('last_name'));
+
         foreach ($members as $member) {
-            if (empty($member['full_name'])) {
+            $inputName    = trim($member['name_input'] ?? $member['full_name'] ?? '');
+            $relationship = $member['relationship_type'] ?? '';
+
+            if (empty($inputName)) {
                 continue;
+            }
+
+            // If it's a Child, build their 4-part full name dynamically
+            if ($relationship === 'Child') {
+                $computedFullName = preg_replace(
+                    '/\s+/',
+                    ' ',
+                    "{$inputName} {$headFirstName} {$headFatherName} {$headLastName}"
+                );
+            } else {
+                // For Spouse, use the complete full name provided in the input
+                $computedFullName = $inputName;
             }
 
             $this->familyModel->save([
                 'resident_id'        => $residentId,
-                'relationship_type'  => $member['relationship_type'],
-                'full_name'          => $member['full_name'],
-                'dob'                => $member['dob'],
-                'gender'             => $member['gender'],
+                'relationship_type'  => $relationship,
+                'full_name'          => $computedFullName,
+                'dob'                => $member['dob'] ?? null,
+                'gender'             => $member['gender'] ?? null,
                 'has_disability'     => $member['has_disability'] ?? 0,
                 'disability_details' => $member['disability_details'] ?: null,
             ]);

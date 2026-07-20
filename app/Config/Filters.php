@@ -76,9 +76,10 @@ class Filters extends BaseFilters
             // 'csrf',
             // 'invalidchars',
             'session' => ['except' => [
+                'household',
+                'household/*',
                 'household-register',
                 'household-register/*',
-                'household/*',
                 'login*',
                 // 'logout',
                 'register*',

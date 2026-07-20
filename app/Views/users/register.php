@@ -11,7 +11,7 @@
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-lg-10">
 
             <div class="text-center mb-4">
                 <h1 class="h3 fw-bold text-dark">تسجيل عائلات المخيم</h1>
@@ -39,13 +39,21 @@
                             <label class="form-label small fw-bold">الاسم الأول <span class="text-danger">*</span></label>
                             <input type="text" name="first_name" class="form-control form-control-sm" value="<?= old('first_name') ?>" required>
                         </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">اسم الأب <span class="text-danger">*</span></label>
+                            <input type="text" name="father_name" class="form-control form-control-sm" value="<?= old('father_name') ?>" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">اسم الجد <span class="text-danger">*</span></label>
+                            <input type="text" name="grandfather_name" class="form-control form-control-sm" value="<?= old('grandfather_name') ?>" required>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">اسم العائلة <span class="text-danger">*</span></label>
                             <input type="text" name="last_name" class="form-control form-control-sm" value="<?= old('last_name') ?>" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">رقم التسجيل / وثيقة الهوية <span class="text-danger">*</span></label>
-                            <input type="text" name="document_id" class="form-control form-control-sm" value="<?= old('document_id') ?>" placeholder="مثال: الهوية الوطنية أو رقم جواز السفر" required>
+                            <input type="text" name="document_id" class="form-control form-control-sm" value="<?= old('document_id') ?>" placeholder="الهوية أو رقم جواز السفر" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">تاريخ الميلاد <span class="text-danger">*</span></label>
@@ -91,7 +99,7 @@
                     </div>
                     <div class="card-body p-0 bg-white">
                         <ul class="list-group list-group-flush" id="familyMembersContainer">
-                            <li class="list-group-item text-center text-muted py-4" id="emptyRowNotice">
+                            <li class="list-group-item text-center text-muted py-4 <?= old('members') ? 'd-none' : '' ?>" id="emptyRowNotice">
                                 لم يتم إضافة زوجة أو أبناء بعد. اضغط على الأزرار أعلاه للمتابعة إذا كان ذلك ينطبق على عائلتك.
                             </li>
                         </ul>
@@ -110,11 +118,23 @@
 <script>
 let memberIndex = 0;
 
-function addFamilyMember(type, arabicLabel) {
+function addFamilyMember(type, arabicLabel, initialData = {}) {
     const notice = document.getElementById('emptyRowNotice');
-    if (notice) notice.remove();
+    if (notice) notice.classList.add('d-none');
 
     const container = document.getElementById('familyMembersContainer');
+
+    const firstName = initialData.first_name || initialData.full_name || '';
+    const documentId = initialData.document_id || '';
+    const dob = initialData.dob || '';
+    const gender = initialData.gender || '';
+    const hasDisability = initialData.has_disability ? 'checked' : '';
+    const disabilityDetails = initialData.disability_details || '';
+    const detailsDisplayClass = initialData.has_disability ? '' : 'd-none';
+
+    // Dynamic field label based on whether it's a Spouse or Child
+    const nameLabel = type === 'Spouse' ? 'الاسم الرباعي الكامل' : 'الاسم الأول';
+    const namePlaceholder = type === 'Spouse' ? 'اسم الزوج/الزوجة الكامل' : 'اسم الطفل فقط';
 
     const html = `
         <li class="list-group-item bg-white p-3 border-bottom position-relative member-item">
@@ -125,27 +145,34 @@ function addFamilyMember(type, arabicLabel) {
                 </div>
                 <input type="hidden" name="members[${memberIndex}][relationship_type]" value="${type}">
 
-                <div class="col-md-4">
-                    <input type="text" name="members[${memberIndex}][full_name]" class="form-control form-control-sm" placeholder="الاسم الكامل" required>
+                <div class="col-md-3">
+                    <label class="form-label small mb-1 fw-bold">${nameLabel} <span class="text-danger">*</span></label>
+                    <input type="text" name="members[${memberIndex}][name_input]" class="form-control form-control-sm" value="${firstName}" placeholder="${namePlaceholder}" required>
                 </div>
                 <div class="col-md-3">
-                    <input type="date" name="members[${memberIndex}][dob]" class="form-control form-control-sm" required>
+                    <label class="form-label small mb-1 fw-bold">وثيقة الهوية / ID <span class="text-danger">*</span></label>
+                    <input type="text" name="members[${memberIndex}][document_id]" class="form-control form-control-sm" value="${documentId}" placeholder="رقم الهوية" required>
                 </div>
                 <div class="col-md-2">
+                    <label class="form-label small mb-1 fw-bold">تاريخ الميلاد <span class="text-danger">*</span></label>
+                    <input type="date" name="members[${memberIndex}][dob]" class="form-control form-control-sm" value="${dob}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small mb-1 fw-bold">الجنس <span class="text-danger">*</span></label>
                     <select name="members[${memberIndex}][gender]" class="form-select form-select-sm" required>
                         <option value="">الجنس</option>
-                        <option value="Male">ذكر</option>
-                        <option value="Female">أنثى</option>
+                        <option value="Male" ${gender === 'Male' ? 'selected' : ''}>ذكر</option>
+                        <option value="Female" ${gender === 'Female' ? 'selected' : ''}>أنثى</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-check form-switch mt-1">
-                        <input class="form-check-input" type="checkbox" name="members[${memberIndex}][has_disability]" value="1" id="dis_${memberIndex}" onchange="document.getElementById('details_${memberIndex}').classList.toggle('d-none', !this.checked)">
-                        <label class="form-check-label small" for="dis_${memberIndex}">هل توجد إعاقة؟</label>
+                <div class="col-md-2">
+                    <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" name="members[${memberIndex}][has_disability]" value="1" id="dis_${memberIndex}" ${hasDisability} onchange="document.getElementById('details_${memberIndex}').classList.toggle('d-none', !this.checked)">
+                        <label class="form-check-label small" for="dis_${memberIndex}">إعاقة؟</label>
                     </div>
                 </div>
-                <div class="col-12 d-none" id="details_${memberIndex}">
-                    <input type="text" name="members[${memberIndex}][disability_details]" class="form-control form-control-sm" placeholder="حدد تفاصيل الاحتياجات الصحية أو الطبية المحددة...">
+                <div class="col-12 ${detailsDisplayClass}" id="details_${memberIndex}">
+                    <input type="text" name="members[${memberIndex}][disability_details]" class="form-control form-control-sm" value="${disabilityDetails}" placeholder="حدد تفاصيل الاحتياجات الصحية أو الطبية المحددة...">
                 </div>
             </div>
         </li>
@@ -153,7 +180,22 @@ function addFamilyMember(type, arabicLabel) {
 
     container.insertAdjacentHTML('beforeend', html);
     memberIndex++;
+    container.insertAdjacentHTML('beforeend', html);
+    memberIndex++;
 }
+
+// Restore dynamic family members if validation fails and page redirects back with old input
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if (old('members')) : ?>
+        <?php foreach (old('members') as $member) : ?>
+            addFamilyMember(
+                '<?= esc($member['relationship_type'] ?? 'Child') ?>',
+                '<?= ($member['relationship_type'] ?? '') === 'Spouse' ? 'زوج/زوجة' : 'ابن/ابنة' ?>',
+                <?= json_encode($member) ?>
+            );
+        <?php endforeach; ?>
+    <?php endif; ?>
+});
 </script>
 
 </body>
