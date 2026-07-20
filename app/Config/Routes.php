@@ -8,7 +8,7 @@ use CodeIgniter\Router\RouteCollection;
 // $routes->get('household-register', 'RegisterController::index');
 // $routes->post('household-register/save', 'RegisterController::save');
 
-$routes->group('household', function($routes) {
+$routes->group('/household', function($routes) {
     $routes->get('household-register', 'RegisterController::index');
     $routes->post('household-register/save', 'RegisterController::save');
 
@@ -21,6 +21,7 @@ $routes->group('household', function($routes) {
     $routes->post('add-member', 'PortalController::addMember');
     $routes->post('remove-member/(:num)', 'PortalController::removeMember/$1');
 });
+
 // 2. Authentication Routes (Shield handles its own internal routing)
 service('auth')->routes($routes);
 
