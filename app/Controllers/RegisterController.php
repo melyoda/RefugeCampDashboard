@@ -8,44 +8,117 @@ use CodeIgniter\Controller;
 
 class RegisterController extends Controller
 {
+    // Class-wide properties for our models
+    protected $residentModel;
+    protected $familyModel;
+
+    public function __construct()
+    {
+        // Initializing the models here cleans out noise from individual methods
+        $this->residentModel = new ResidentModel();
+        $this->familyModel   = new FamilyMemberModel();
+    }
+
+    /**
+     * Renders the registration form view
+     */
     public function index()
     {
         return view('users/register');
     }
 
+    /**
+     * Main action handling the registration form submission
+     */
     public function save()
+    {
+        // 1. Run input format validation via helper
+        if (!$this->validateRegistrationInput()) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $incomingMembers = $this->request->getPost('members') ?: [];
+
+        // 2. Tally dynamic members and check corporate business logic
+        $counts = $this->tallyFamilyMembers($incomingMembers);
+        if ($counts['spouses'] > 4) {
+            return redirect()->back()->withInput()->with('errors', [
+                'spouses' => 'عذراً، لا يمكن تسجيل أكثر من 4 زوجات للملف العائلي الواحد.'
+            ]);
+        }
+
+        // 3. Generate credentials and write core head-of-household profile
+        $plainAccessCode = $this->generateSecureAccessCode();
+        $residentId = $this->savePrimaryResident($counts['children'], $plainAccessCode);
+
+        // 4. Record individual dynamic sub-dependents mapping
+        if ($residentId && !empty($incomingMembers)) {
+            $this->saveFamilyMembers($residentId, $incomingMembers);
+        }
+
+        // 5. Send payload metadata straight to success landing
+        return view('users/registration_success', [
+            'name' => trim($this->request->getPost('first_name') . ' ' . $this->request->getPost('last_name')),
+            'id'   => $this->request->getPost('document_id'),
+            'code' => $plainAccessCode
+        ]);
+    }
+
+    /**
+     * Enforces request validation rules, string sizes, and explicit regex matches
+     */
+    private function validateRegistrationInput(): bool
     {
         $rules = [
             'first_name'    => 'required|min_length[2]|max_length[100]',
             'last_name'     => 'required|min_length[2]|max_length[100]',
-            'document_id'   => 'required|min_length[3]|max_length[100]|is_unique[residents.document_id]',
-            'primary_phone' => 'required|min_length[7]|max_length[20]',
+            'document_id'   => 'required|regex_match[/^[0-9]{9}$/]|is_unique[residents.document_id]',
+            'primary_phone' => 'required|regex_match[/^05[69][0-9]{7}$/]',
+            'backup_phone'  => 'permit_empty|regex_match[/^05[69][0-9]{7}$/]',
             'dob'           => 'required|valid_date[Y-m-d]',
             'marital_status'=> 'required',
         ];
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
+        $errors = [
+            'document_id' => [
+                'regex_match' => 'يجب أن يتكون رقم الهوية من 9 أرقام فقط دون أي أحرف.',
+                'is_unique'   => 'رقم الهوية هذا مسجل بالفعل في النظام.'
+            ],
+            'primary_phone' => [
+                'regex_match' => 'يجب أن يكون رقم الهاتف مكوناً من 10 أرقام ويبدأ بـ 056 أو 059 بدون مقدمة دولية.'
+            ],
+            'backup_phone' => [
+                'regex_match' => 'يجب أن يكون رقم الهاتف الاحتياطي مكوناً من 10 أرقام ويبدأ بـ 056 أو 059.'
+            ]
+        ];
 
-        // 1. Initialize our models
-        $residentModel = new ResidentModel();
-        $familyModel   = new FamilyMemberModel();
+        return $this->validate($rules, $errors);
+    }
 
-        // 2. Generate a secure, human-readable access code
-        $plainAccessCode = $this->generateSecureAccessCode();
+    /**
+     * Loops through dynamic arrays once to map structural context counts
+     */
+    private function tallyFamilyMembers(array $members): array
+    {
+        $tally = ['children' => 0, 'spouses' => 0];
 
-        // 3. Count dependents dynamically from the form payload array
-        $incomingMembers = $this->request->getPost('members') ?: [];
-        $childrenCount   = 0;
-
-        foreach ($incomingMembers as $m) {
-            if (($m['relationship_type'] ?? '') === 'Child') {
-                $childrenCount++;
+        foreach ($members as $m) {
+            $relationship = $m['relationship_type'] ?? '';
+            if ($relationship === 'Child') {
+                $tally['children']++;
+            } elseif ($relationship === 'Spouse') {
+                $tally['spouses']++;
             }
         }
 
-        // 4. Save the Primary Resident Profile (Forces status to pending by setting is_active = 0)
+        return $tally;
+    }
+
+    /**
+     * Submits primary head of household properties payload to the DB layer
+     */
+    private function savePrimaryResident(int $childrenCount, string $plainAccessCode): int
+    {
         $residentData = [
             'document_id'        => $this->request->getPost('document_id'),
             'access_code_hash'   => password_hash($plainAccessCode, PASSWORD_BCRYPT),
@@ -59,38 +132,38 @@ class RegisterController extends Controller
             'children_count'     => $childrenCount,
             'has_disability'     => $this->request->getPost('has_disability') ?? 0,
             'disability_details' => $this->request->getPost('disability_details') ?: null,
-            'is_active'          => 0 // 0 = Pending Triage Status
+            'is_active'          => 0
         ];
 
-        $residentModel->save($residentData);
-        $residentId = $residentModel->getInsertID(); // Grab the generated ID for Foreign Key mapping
-
-        // 5. Loop through and save individual family members to the sub-table
-        if (!empty($incomingMembers) && $residentId) {
-            foreach ($incomingMembers as $member) {
-                // Safeguard against empty dynamic rows
-                if (empty($member['full_name'])) continue;
-
-                $familyModel->save([
-                    'resident_id'        => $residentId,
-                    'relationship_type'  => $member['relationship_type'],
-                    'full_name'          => $member['full_name'],
-                    'dob'                => $member['dob'],
-                    'gender'             => $member['gender'],
-                    'has_disability'     => $member['has_disability'] ?? 0,
-                    'disability_details' => $member['disability_details'] ?: null,
-                ]);
-            }
-        }
-
-        // 6. Direct to a registration confirmation page displaying their generated credentials
-        return view('users/registration_success', [
-            'name' => $residentData['full_name'],
-            'id'   => $residentData['document_id'],
-            'code' => $plainAccessCode
-        ]);
+        $this->residentModel->save($residentData);
+        return (int) $this->residentModel->getInsertID();
     }
 
+    /**
+     * Populates supporting child structural array blocks to sub-table
+     */
+    private function saveFamilyMembers(int $residentId, array $members): void
+    {
+        foreach ($members as $member) {
+            if (empty($member['full_name'])) {
+                continue;
+            }
+
+            $this->familyModel->save([
+                'resident_id'        => $residentId,
+                'relationship_type'  => $member['relationship_type'],
+                'full_name'          => $member['full_name'],
+                'dob'                => $member['dob'],
+                'gender'             => $member['gender'],
+                'has_disability'     => $member['has_disability'] ?? 0,
+                'disability_details' => $member['disability_details'] ?: null,
+            ]);
+        }
+    }
+
+    /**
+     * Generates a human-friendly plain text secure verification access token
+     */
     private function generateSecureAccessCode(): string
     {
         $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';

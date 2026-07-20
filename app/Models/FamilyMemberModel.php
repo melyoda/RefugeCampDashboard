@@ -16,6 +16,7 @@ class FamilyMemberModel extends Model
         'resident_id',
         'relationship_type',
         'full_name',
+        'document_id',
         'dob',
         'gender',
         'has_disability',

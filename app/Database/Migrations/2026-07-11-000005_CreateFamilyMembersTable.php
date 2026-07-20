@@ -28,6 +28,11 @@ class CreateFamilyMembersTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
             ],
+            'document_id' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 255,
+                'null'       => true,
+            ],
             'dob' => [
                 'type' => 'DATE',
             ],
