@@ -69,7 +69,7 @@
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= base_url('household/auth') ?>" method="POST">
+                <form action="<?= base_url('/auth') ?>" method="POST">
                     <?= csrf_field() ?>
 
                     <div class="mb-3">

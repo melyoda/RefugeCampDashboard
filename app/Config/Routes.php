@@ -4,32 +4,42 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
-// 1. Public Routes for Registration
-// $routes->get('household-register', 'RegisterController::index');
-// $routes->post('household-register/save', 'RegisterController::save');
+// $routes->group('/', function($routes) {
+//     $routes->get('household-register', 'RegisterController::index');
+//     $routes->post('household-register/save', 'RegisterController::save');
 
-$routes->group('/household', function($routes) {
-    $routes->get('household-register', 'RegisterController::index');
-    $routes->post('household-register/save', 'RegisterController::save');
+//     $routes->get('/', 'PortalController::login');
+//     $routes->get('login', 'PortalController::login');
+//     $routes->post('auth', 'PortalController::auth');
+//     $routes->get('dashboard', 'PortalController::dashboard');
+//     $routes->get('logout', 'PortalController::logout');
 
-    $routes->get('/', 'PortalController::login');
-    $routes->get('login', 'PortalController::login');
-    $routes->post('auth', 'PortalController::auth');
-    $routes->get('dashboard', 'PortalController::dashboard');
-    $routes->get('logout', 'PortalController::logout');
+//     $routes->post('add-member', 'PortalController::addMember');
+//     $routes->post('remove-member/(:num)', 'PortalController::removeMember/$1');
+// });
 
-    $routes->post('add-member', 'PortalController::addMember');
-    $routes->post('remove-member/(:num)', 'PortalController::removeMember/$1');
-});
+//Household Portal & Registration Routes (No prefix needed)
+$routes->get('household-register', 'RegisterController::index');
+$routes->post('household-register/save', 'RegisterController::save');
 
-// 2. Authentication Routes (Shield handles its own internal routing)
+//Landing page + Auth actions
+$routes->get('', 'PortalController::login');
+$routes->get('login', 'PortalController::login');
+$routes->post('auth', 'PortalController::auth');
+$routes->get('dashboard', 'PortalController::dashboard');
+$routes->get('logout', 'PortalController::logout');
+
+//Household member management
+$routes->post('add-member', 'PortalController::addMember');
+$routes->post('remove-member/(:num)', 'PortalController::removeMember/$1');
+
+//Authentication Routes (Shield handles its own internal routing)
 service('auth')->routes($routes);
 
-// 3. Main Dashboard Routes
-$routes->get('/', 'DashboardController::index');
-$routes->get('dashboard', 'DashboardController::index');
+//Main Dashboard Routes
+$routes->get('portal-manage-x89', 'DashboardController::index');
 
-// 4. Protected Activities Routes
+//Protected Activities Routes
 $routes->group('activities', function($routes) {
     $routes->get('/', 'ActivitiesController::index');
     $routes->get('create', 'ActivitiesController::create');
@@ -43,7 +53,7 @@ $routes->group('activities', function($routes) {
     $routes->post('save-distribution/(:num)', 'ActivitiesController::saveDistribution/$1');
 });
 
-// 5. Protected Residents Routes
+//Protected Residents Routes
 $routes->group('residents', function($routes) {
 $routes->get('/', 'ResidentsController::index');
     $routes->get('create', 'ResidentsController::create');
@@ -56,7 +66,7 @@ $routes->get('/', 'ResidentsController::index');
     $routes->post('reject/(:num)', 'ResidentsController::reject/$1');
 });
 
-// 6. Protected Donations Ledger Routes
+//Protected Donations Ledger Routes
 $routes->group('donations', function($routes) {
     $routes->get('/', 'DonationsController::index');
     $routes->get('create', 'DonationsController::create');

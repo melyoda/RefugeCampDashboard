@@ -99,7 +99,7 @@
                 </div>
             <?php endif; ?>
 
-            <form action="<?= base_url('household/household-register/save') ?>" method="POST" id="registrationForm">
+            <form action="<?= base_url('/household-register/save') ?>" method="POST" id="registrationForm">
                 <?= csrf_field() ?>
 
                 <!-- 1. Head of Family Details -->
