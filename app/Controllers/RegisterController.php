@@ -46,6 +46,11 @@ class RegisterController extends Controller
                 'spouses' => 'عذراً، لا يمكن تسجيل أكثر من 4 زوجات للملف العائلي الواحد.'
             ]);
         }
+        if ($counts['children'] > 15) {
+            return redirect()->back()->withInput()->with('errors', [
+                'children' => 'عذراً، لا يمكن تسجيل أكثر من 15 إبن/إبنة للملف العائلي الواحد.'
+            ]);
+        }
 
         // 3. Generate credentials and write core head-of-household profile
         $plainAccessCode = $this->generateSecureAccessCode();

@@ -39,11 +39,11 @@
                             <label class="form-label small fw-bold">الاسم الأول <span class="text-danger">*</span></label>
                             <input type="text" name="first_name" class="form-control form-control-sm" value="<?= old('first_name') ?>" required>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold">اسم الأب <span class="text-danger">*</span></label>
                             <input type="text" name="father_name" class="form-control form-control-sm" value="<?= old('father_name') ?>" required>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold">اسم الجد <span class="text-danger">*</span></label>
                             <input type="text" name="grandfather_name" class="form-control form-control-sm" value="<?= old('grandfather_name') ?>" required>
                         </div>
@@ -119,6 +119,19 @@
 let memberIndex = 0;
 
 function addFamilyMember(type, arabicLabel, initialData = {}) {
+    // 1. Check limit for Children (Max 15)
+    if (type === 'Child') {
+        const container = document.getElementById('familyMembersContainer');
+        // Count how many hidden inputs with relationship_type = 'Child' currently exist
+        const currentChildrenCount = container.querySelectorAll('input[value="Child"]').length;
+
+        if (currentChildrenCount >= 15) {
+            alert('عذراً، الحد الأقصى المسموح به حالياً لإضافة الأبناء هو 15 لطفل.');
+            return; // Stop execution
+        }
+    }
+
+    // 2. Hide empty notice
     const notice = document.getElementById('emptyRowNotice');
     if (notice) notice.classList.add('d-none');
 
@@ -132,7 +145,6 @@ function addFamilyMember(type, arabicLabel, initialData = {}) {
     const disabilityDetails = initialData.disability_details || '';
     const detailsDisplayClass = initialData.has_disability ? '' : 'd-none';
 
-    // Dynamic field label based on whether it's a Spouse or Child
     const nameLabel = type === 'Spouse' ? 'الاسم الرباعي الكامل' : 'الاسم الأول';
     const namePlaceholder = type === 'Spouse' ? 'اسم الزوج/الزوجة الكامل' : 'اسم الطفل فقط';
 
@@ -141,7 +153,7 @@ function addFamilyMember(type, arabicLabel, initialData = {}) {
             <div class="row g-2 align-items-center">
                 <div class="col-12 mb-1 d-flex justify-content-between align-items-center">
                     <span class="badge ${type === 'Spouse' ? 'bg-info text-dark' : 'bg-primary'} fw-bold">${arabicLabel}</span>
-                    <button type="button" class="btn-close ms-0 me-auto" onclick="this.closest('.member-item').remove()"></button>
+                    <button type="button" class="btn-close ms-0 me-auto" onclick="removeFamilyMember(this)"></button>
                 </div>
                 <input type="hidden" name="members[${memberIndex}][relationship_type]" value="${type}">
 
@@ -180,8 +192,15 @@ function addFamilyMember(type, arabicLabel, initialData = {}) {
 
     container.insertAdjacentHTML('beforeend', html);
     memberIndex++;
-    container.insertAdjacentHTML('beforeend', html);
-    memberIndex++;
+}
+
+function removeFamilyMember(btn) {
+    btn.closest('.member-item').remove();
+    const container = document.getElementById('familyMembersContainer');
+    const remainingMembers = container.querySelectorAll('.member-item');
+    if (remainingMembers.length === 0) {
+        document.getElementById('emptyRowNotice').classList.remove('d-none');
+    }
 }
 
 // Restore dynamic family members if validation fails and page redirects back with old input
