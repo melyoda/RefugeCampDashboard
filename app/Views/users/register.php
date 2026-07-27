@@ -196,7 +196,7 @@ let memberIndex = 0;
 
 function addFamilyMember(type, arabicLabel, initialData = {}) {
     if (type === 'Child') {
-        const container = document.getElementById('familsyMembersContainer');
+        const container = document.getElementById('familyMembersContainer');
         const currentChildrenCount = container.querySelectorAll('input[value="Child"]').length;
 
         if (currentChildrenCount >= 15) {

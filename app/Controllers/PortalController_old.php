@@ -8,9 +8,12 @@ use CodeIgniter\Controller;
 
 class PortalController extends Controller
 {
+    private string $baseRoute = '';
+
     public function login()
     {
         if (session()->get('is_resident_logged_in')) {
+            // return redirect()->to($this->baseRoute . 'dashboard');
             return redirect()->to(base_url('dashboard'));
         }
 
@@ -22,15 +25,23 @@ class PortalController extends Controller
         $session = session();
         $model   = new ResidentModel();
 
-        $documentId = trim((string) $this->request->getPost('document_id'));
-        $accessCode = trim((string) $this->request->getPost('access_code'));
+        $documentId = $this->request->getPost('document_id');
+        $accessCode = $this->request->getPost('access_code');
 
-        if (empty($documentId) || empty($accessCode)) {
-            return redirect()->back()->withInput()->with('error', 'Please enter both Registration ID and Access Code.');
-        }
-
-        // 1. Find resident by document ID
+        // 1. Find the resident record by their registration document ID (e.g., National ID or Passport string)
         $resident = $model->where('document_id', $documentId)->first();
+
+        // if (!$resident) {
+        //     return redirect()->back()->withInput()->with('error', 'Invalid Registration ID or Access Code.');
+        // }
+
+        // if (!password_verify($accessCode, $resident['access_code_hash'])) {
+        //     return redirect()->back()->withInput()->with('error', 'Invalid Registration ID or Access Code.');
+        // }
+
+        // if ((int)$resident['is_active'] === 0) {
+        //     return redirect()->back()->withInput()->with('error', 'Your registration is currently pending review.');
+        // }
 
         if (!$resident) {
             return redirect()->back()->withInput()->with('error', 'Invalid Registration ID or Access Code.');
@@ -46,13 +57,14 @@ class PortalController extends Controller
             return redirect()->back()->withInput()->with('error', 'Your registration is currently pending review.');
         }
 
-        // 4. Save session data
+        // 2. Fix: Store the actual primary key 'id' explicitly as 'resident_id'
         $session->set([
-            'resident_id'           => $resident['id'],
+            'resident_id'           => $resident['id'], // This is the database auto-increment ID
             'resident_name'         => $resident['full_name'],
             'is_resident_logged_in' => true
         ]);
 
+        // return redirect()->to($this->baseRoute . 'dashboard');
         return redirect()->to(base_url('dashboard'));
     }
 
@@ -60,8 +72,9 @@ class PortalController extends Controller
     {
         $session = session();
 
+        // Custom security guard check for this specific dashboard endpoint
         if (!$session->get('is_resident_logged_in')) {
-            return redirect()->to(base_url('login'))->with('error', 'Please log in to access your family profile.');
+            return redirect()->to($this->baseRoute . 'login')->with('error', 'Please log in to access your family profile.');
         }
 
         $residentModel = new ResidentModel();
@@ -72,12 +85,13 @@ class PortalController extends Controller
         $data['family_head'] = $residentModel->find($residentId);
         $data['dependents']  = $familyModel->where('resident_id', $residentId)->findAll();
 
+        // fetch the distribution history for this logged-in resident
         $db = \Config\Database::connect();
         $data['history'] = $db->table('activity_residents')
             ->join('activities', 'activities.id = activity_residents.activity_id')
             ->where('activity_residents.resident_id', $residentId)
-            ->where('activities.deleted_at', null)
-            ->orderBy('activity_residents.created_at', 'DESC')
+            ->where('activities.deleted_at', null) // Filter out soft-deleted activities
+            ->orderBy('activity_residents.created_at', 'DESC') // Sort by when they actually received it
             ->select('activities.title, activities.description, activities.aid_category, activities.is_distributed_aid, activity_residents.created_at')
             ->get()
             ->getResultArray();
@@ -89,7 +103,7 @@ class PortalController extends Controller
     {
         $session = session();
         if (!$session->get('is_resident_logged_in')) {
-            return redirect()->to(base_url('login'));
+            return redirect()->to($this->baseRoute . 'login');
         }
 
         $rules = [
@@ -106,6 +120,7 @@ class PortalController extends Controller
         $familyModel = new FamilyMemberModel();
         $residentId  = $session->get('resident_id');
 
+        // 5. Saving with 'resident_id' linking back to the head of household
         $familyModel->save([
             'resident_id'        => $residentId,
             'relationship_type'  => $this->request->getPost('relationship_type'),
@@ -118,6 +133,7 @@ class PortalController extends Controller
 
         $this->updateChildrenCount($residentId);
 
+        // return redirect()->to($this->baseRoute . 'dashboard')->with('success', 'Family member appended to roster.');
         return redirect()->to(base_url('dashboard'))->with('success', 'Family member appended to roster.');
     }
 
@@ -125,20 +141,22 @@ class PortalController extends Controller
     {
         $session = session();
         if (!$session->get('is_resident_logged_in')) {
-            return redirect()->to(base_url('login'));
+            return redirect()->to($this->baseRoute . 'login');
         }
 
         $familyModel = new FamilyMemberModel();
         $residentId  = $session->get('resident_id');
 
+        // 6. Checked against 'resident_id'
         $member = $familyModel->where('id', $id)->where('resident_id', $residentId)->first();
 
         if ($member) {
             $familyModel->delete($id);
             $this->updateChildrenCount($residentId);
-            return redirect()->to(base_url('dashboard'))->with('success', 'Member removed.');
+            return redirect()->to($this->baseRoute . 'dashboard')->with('success', 'Member removed.');
         }
 
+        // return redirect()->to($this->baseRoute . 'dashboard')->with('error', 'Unauthorized request.');
         return redirect()->to(base_url('dashboard'))->with('error', 'Unauthorized request.');
     }
 
@@ -157,6 +175,7 @@ class PortalController extends Controller
     public function logout()
     {
         session()->destroy();
+        // return redirect()->to($this->baseRoute . 'login');
         return redirect()->to(base_url('login'));
     }
 }

@@ -78,7 +78,7 @@
         <span class="navbar-brand fw-bold fs-5">⛺ بوابة العائلة</span>
         <div class="d-flex align-items-center">
             <span class="text-light small ms-3 d-none d-sm-inline">مرحباً بك، <strong><?= esc($family_head['full_name']) ?></strong></span>
-            <a href="<?= base_url('household/logout') ?>" class="btn btn-sm btn-outline-light rounded-pill px-3">تسجيل الخروج</a>
+            <a href="<?= base_url('logout') ?>" class="btn btn-sm btn-outline-light rounded-pill px-3">تسجيل الخروج</a>
         </div>
     </div>
 </nav>
@@ -157,7 +157,7 @@
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-end">
-                                        <form action="<?= base_url('household/remove-member/' . $dep['id']) ?>" method="POST" onsubmit="return confirm('هل أنت متأكد من إزالة هذا الفرد من سجل العائلة النشط؟');" class="d-inline">
+                                        <form action="<?= base_url('remove-member/' . $dep['id']) ?>" method="POST" onsubmit="return confirm('هل أنت متأكد من إزالة هذا الفرد من سجل العائلة النشط؟');" class="d-inline">
                                             <?= csrf_field() ?>
                                             <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2 rounded-2">إزالة</button>
                                         </form>
@@ -227,7 +227,7 @@
                 <h5 class="modal-title fw-bold fs-6">إضافة تابع للأسرة</h5>
                 <button type="button" class="btn-close btn-close-white m-0" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= base_url('household/add-member') ?>" method="POST">
+            <form action="<?= base_url('add-member') ?>" method="POST">
                 <?= csrf_field() ?>
                 <div class="modal-body p-4 row g-3">
                     <div class="col-md-6">

@@ -69,7 +69,7 @@
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= base_url('/auth') ?>" method="POST">
+                <form action="<?= base_url('auth') ?>" method="POST">
                     <?= csrf_field() ?>
 
                     <div class="mb-3">
@@ -90,7 +90,7 @@
 
             <!-- Footer link -->
             <div class="text-center mt-4">
-                <a href="<?= base_url('household/household-register') ?>" class="small link-warm text-decoration-none fw-bold">← هل تريد تسجيل عائلة جديدة؟</a>
+                <a href="<?= base_url('/household-register') ?>" class="small link-warm text-decoration-none fw-bold">← هل تريد تسجيل عائلة جديدة؟</a>
             </div>
 
         </div>

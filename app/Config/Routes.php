@@ -23,7 +23,7 @@ $routes->get('household-register', 'RegisterController::index');
 $routes->post('household-register/save', 'RegisterController::save');
 
 //Landing page + Auth actions
-$routes->get('', 'PortalController::login');
+$routes->get('/', 'PortalController::login');
 $routes->get('login', 'PortalController::login');
 $routes->post('auth', 'PortalController::auth');
 $routes->get('dashboard', 'PortalController::dashboard');
