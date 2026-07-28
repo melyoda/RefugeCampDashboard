@@ -4,42 +4,29 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
-// $routes->group('/', function($routes) {
-//     $routes->get('household-register', 'RegisterController::index');
-//     $routes->post('household-register/save', 'RegisterController::save');
 
-//     $routes->get('/', 'PortalController::login');
-//     $routes->get('login', 'PortalController::login');
-//     $routes->post('auth', 'PortalController::auth');
-//     $routes->get('dashboard', 'PortalController::dashboard');
-//     $routes->get('logout', 'PortalController::logout');
-
-//     $routes->post('add-member', 'PortalController::addMember');
-//     $routes->post('remove-member/(:num)', 'PortalController::removeMember/$1');
-// });
-
-//Household Portal & Registration Routes (No prefix needed)
-$routes->get('household-register', 'RegisterController::index');
-$routes->post('household-register/save', 'RegisterController::save');
-
-//Landing page + Auth actions
-$routes->get('/', 'PortalController::login');
-$routes->get('login', 'PortalController::login');
-$routes->post('auth', 'PortalController::auth');
-$routes->get('dashboard', 'PortalController::dashboard');
-$routes->get('logout', 'PortalController::logout');
-
-//Household member management
-$routes->post('add-member', 'PortalController::addMember');
-$routes->post('remove-member/(:num)', 'PortalController::removeMember/$1');
-
-//Authentication Routes (Shield handles its own internal routing)
+//Authentication Routes (shield)
 service('auth')->routes($routes);
 
-//Main Dashboard Routes
-$routes->get('portal-manage-x89', 'DashboardController::index');
+$routes->group('/r', function($routes) {
+    $routes->get('household-register', 'RegisterController::index');
+    $routes->post('household-register/save', 'RegisterController::save');
 
-//Protected Activities Routes
+    $routes->get('/', 'PortalController::login');
+    $routes->get('login', 'PortalController::login');
+    $routes->post('auth', 'PortalController::auth');
+    $routes->get('dashboard', 'PortalController::dashboard');
+    $routes->get('logout', 'PortalController::logout');
+
+    $routes->post('add-member', 'PortalController::addMember');
+    $routes->post('remove-member/(:num)', 'PortalController::removeMember/$1');
+});
+
+
+//Main Dashboard Routes
+$routes->get('/portal-manage-x89', 'DashboardController::index');
+
+// Protected Activities Routes
 $routes->group('activities', function($routes) {
     $routes->get('/', 'ActivitiesController::index');
     $routes->get('create', 'ActivitiesController::create');
@@ -53,9 +40,9 @@ $routes->group('activities', function($routes) {
     $routes->post('save-distribution/(:num)', 'ActivitiesController::saveDistribution/$1');
 });
 
-//Protected Residents Routes
+// Protected Residents Routes
 $routes->group('residents', function($routes) {
-$routes->get('/', 'ResidentsController::index');
+    $routes->get('/', 'ResidentsController::index');
     $routes->get('create', 'ResidentsController::create');
     $routes->post('store', 'ResidentsController::store');
     $routes->get('edit/(:num)', 'ResidentsController::edit/$1');

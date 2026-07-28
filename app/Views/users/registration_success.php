@@ -32,7 +32,7 @@
                     ⚠️ هام للغاية: يرجى التقاط لقطة شاشة (Screenshot) لهذه الصفحة أو نسخ رمز الدخول الآن. ستحتاج إلى كل من رقم التسجيل ورمز الدخول لمتابعة حالة طلبك في البوابة لاحقاً!
                 </div>
 
-                 <a href="<?= base_url('login') ?>" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">الانتقال إلى بوابة تسجيل الدخول</a>
+                 <a href="<?= base_url('r/login') ?>" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">الانتقال إلى بوابة تسجيل الدخول</a>
             </div>
         </div>
     </div>

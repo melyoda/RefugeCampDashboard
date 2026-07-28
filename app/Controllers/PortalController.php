@@ -11,7 +11,7 @@ class PortalController extends Controller
     public function login()
     {
         if (session()->get('is_resident_logged_in')) {
-            return redirect()->to(base_url('dashboard'));
+            return redirect()->to(base_url('r/dashboard'));
         }
 
         return view('users/portal_login');
@@ -53,7 +53,7 @@ class PortalController extends Controller
             'is_resident_logged_in' => true
         ]);
 
-        return redirect()->to(base_url('dashboard'));
+        return redirect()->to(base_url('r/dashboard'));
     }
 
     public function dashboard()
@@ -61,7 +61,7 @@ class PortalController extends Controller
         $session = session();
 
         if (!$session->get('is_resident_logged_in')) {
-            return redirect()->to(base_url('login'))->with('error', 'Please log in to access your family profile.');
+            return redirect()->to(base_url('r/login'))->with('error', 'Please log in to access your family profile.');
         }
 
         $residentModel = new ResidentModel();
@@ -89,7 +89,7 @@ class PortalController extends Controller
     {
         $session = session();
         if (!$session->get('is_resident_logged_in')) {
-            return redirect()->to(base_url('login'));
+            return redirect()->to(base_url('r/login'));
         }
 
         $rules = [
@@ -118,14 +118,14 @@ class PortalController extends Controller
 
         $this->updateChildrenCount($residentId);
 
-        return redirect()->to(base_url('dashboard'))->with('success', 'Family member appended to roster.');
+        return redirect()->to(base_url('r/dashboard'))->with('success', 'Family member appended to roster.');
     }
 
     public function removeMember($id)
     {
         $session = session();
         if (!$session->get('is_resident_logged_in')) {
-            return redirect()->to(base_url('login'));
+            return redirect()->to(base_url('r/login'));
         }
 
         $familyModel = new FamilyMemberModel();
@@ -136,10 +136,10 @@ class PortalController extends Controller
         if ($member) {
             $familyModel->delete($id);
             $this->updateChildrenCount($residentId);
-            return redirect()->to(base_url('dashboard'))->with('success', 'Member removed.');
+            return redirect()->to(base_url('r/dashboard'))->with('success', 'Member removed.');
         }
 
-        return redirect()->to(base_url('dashboard'))->with('error', 'Unauthorized request.');
+        return redirect()->to(base_url('r/dashboard'))->with('error', 'Unauthorized request.');
     }
 
     private function updateChildrenCount($residentId)
@@ -157,6 +157,6 @@ class PortalController extends Controller
     public function logout()
     {
         session()->destroy();
-        return redirect()->to(base_url('login'));
+        return redirect()->to(base_url('r/login'));
     }
 }

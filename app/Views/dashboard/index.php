@@ -87,7 +87,7 @@
 
     <!-- 3. FEED ROW LAYOUTS -->
     <div class="row g-4">
-        
+
         <!-- Left Ticker: Recent Actions Layout -->
         <div class="col-md-6">
             <div class="card shadow-sm border-0 h-100">
